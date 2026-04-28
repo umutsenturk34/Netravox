@@ -84,6 +84,9 @@ const companySchema = new mongoose.Schema({
     rejectedSubject: { type: String, default: null },
     rejectedMessage: { type: String, default: null },
   },
+  integrations: {
+    analyticsPropertyId: { type: String, default: null }, // GA4 numeric property ID (örn: 323456789)
+  },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 

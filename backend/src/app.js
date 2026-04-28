@@ -77,6 +77,7 @@ app.use('/api/languages', require('./routes/languages'));
 app.use('/api/roles', require('./routes/roles'));
 app.use('/api/services', require('./routes/services'));
 app.use('/api/properties', require('./routes/properties'));
+app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/public', require('./routes/public'));
 
 // 404

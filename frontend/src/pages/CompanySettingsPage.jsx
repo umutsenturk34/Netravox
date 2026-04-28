@@ -22,6 +22,7 @@ const TABS = [
   { id: 'degerler', label: 'Değerler' },
   { id: 'email', label: 'E-posta Şablonları' },
   { id: 'sosyal', label: 'Sosyal & Diğer' },
+  { id: 'entegrasyon', label: 'Entegrasyonlar' },
 ];
 
 const defaultContent = {
@@ -63,6 +64,7 @@ export default function CompanySettingsPage() {
       { days: 'Cumartesi – Pazar', hours: '07:30 – 23:00' },
     ],
     socialLinks: { instagram: '', facebook: '', twitter: '', youtube: '', tiktok: '' },
+    integrations: { analyticsPropertyId: '' },
     emailSettings: {
       senderName: '',
       replyTo: '',
@@ -120,6 +122,9 @@ export default function CompanySettingsPage() {
           twitter: company.socialLinks?.twitter || '',
           youtube: company.socialLinks?.youtube || '',
           tiktok: company.socialLinks?.tiktok || '',
+        },
+        integrations: {
+          analyticsPropertyId: company.integrations?.analyticsPropertyId || '',
         },
         emailSettings: {
           senderName: company.emailSettings?.senderName || '',
@@ -569,6 +574,23 @@ export default function CompanySettingsPage() {
             <Input label="Twitter / X" value={form.socialLinks.twitter} onChange={(e) => set('socialLinks.twitter', e.target.value)} placeholder="https://twitter.com/gustokartepe" />
             <Input label="YouTube" value={form.socialLinks.youtube} onChange={(e) => set('socialLinks.youtube', e.target.value)} placeholder="https://youtube.com/@gustokartepe" />
             <Input label="TikTok" value={form.socialLinks.tiktok} onChange={(e) => set('socialLinks.tiktok', e.target.value)} placeholder="https://tiktok.com/@gustokartepe" />
+          </Section>
+        )}
+
+        {/* ── ENTEGRASYONLAR ── */}
+        {activeTab === 'entegrasyon' && (
+          <Section title="Google Analytics 4">
+            <div className="rounded-lg p-4 text-sm mb-2" style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}>
+              <p className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Nasıl bulunur?</p>
+              <p>GA4 → Yönetici → Mülk Ayarları → <strong>Mülk Kimliği</strong> (sadece sayısal kısım, örn: <code>323456789</code>)</p>
+              <p className="mt-1">Servis hesabı e-postasını da GA4 mülkünüze <strong>Görüntüleyici</strong> olarak eklemeniz gerekir.</p>
+            </div>
+            <Input
+              label="GA4 Mülk Kimliği (Property ID)"
+              value={form.integrations.analyticsPropertyId}
+              onChange={(e) => set('integrations.analyticsPropertyId', e.target.value.replace(/\D/g, ''))}
+              placeholder="323456789"
+            />
           </Section>
         )}
       </div>
