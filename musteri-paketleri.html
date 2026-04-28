@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',-apple-system,sans-serif;color:#0f172a;background:#fff;font-size:13.5px;line-height:1.6;}
+
+/* KAPAK */
+.cover{
+  width:100%;min-height:100vh;
+  background:linear-gradient(150deg,#0f172a 0%,#1e3a8a 40%,#2563eb 75%,#0ea5e9 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 60px;page-break-after:always;position:relative;overflow:hidden;
+}
+.cover::before{content:'';position:absolute;top:-200px;right:-150px;width:550px;height:550px;
+  background:radial-gradient(circle,rgba(14,165,233,0.2) 0%,transparent 65%);border-radius:50%;}
+.cover::after{content:'';position:absolute;bottom:-160px;left:-120px;width:480px;height:480px;
+  background:radial-gradient(circle,rgba(16,185,129,0.15) 0%,transparent 65%);border-radius:50%;}
+
+.cover-logo{
+  background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);
+  color:#fff;font-size:15px;font-weight:800;letter-spacing:.04em;
+  padding:8px 22px;border-radius:8px;margin-bottom:44px;
+}
+.cover h1{font-size:54px;font-weight:900;color:#fff;text-align:center;line-height:1.1;
+  letter-spacing:-2px;margin-bottom:16px;}
+.cover h1 em{font-style:normal;background:linear-gradient(90deg,#34d399,#60a5fa);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.cover-sub{font-size:18px;color:#bfdbfe;text-align:center;max-width:520px;
+  line-height:1.6;margin-bottom:56px;font-weight:400;}
+
+.cover-cards{display:flex;gap:20px;margin-bottom:60px;}
+.cover-card{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  border-radius:14px;padding:24px 28px;text-align:center;min-width:160px;}
+.cover-card-price{font-size:32px;font-weight:900;color:#fff;display:block;line-height:1;}
+.cover-card-name{font-size:12px;color:#93c5fd;font-weight:600;text-transform:uppercase;
+  letter-spacing:.08em;margin-top:6px;display:block;}
+.cover-card-badge{font-size:10px;margin-top:6px;display:inline-block;
+  background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:100px;color:#e0f2fe;}
+
+.cover-footer{position:absolute;bottom:36px;color:rgba(255,255,255,0.3);font-size:11px;}
+
+/* SAYFA */
+.page{padding:60px 60px;page-break-before:always;}
+.page-inner{max-width:730px;margin:0 auto;}
+
+/* BAŞLIKLAR */
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#2563eb;margin-bottom:6px;}
+.sec-title{font-size:27px;font-weight:800;color:#0f172a;line-height:1.2;letter-spacing:-.5px;margin-bottom:10px;}
+.sec-desc{font-size:14px;color:#475569;max-width:620px;line-height:1.7;margin-bottom:36px;}
+
+/* PAKET KARTALARI */
+.package-card{border-radius:18px;padding:36px 40px;margin-bottom:28px;position:relative;overflow:hidden;}
+.package-card.starter{background:#f8fafc;border:2px solid #e2e8f0;}
+.package-card.pro{background:linear-gradient(135deg,#1e3a8a,#2563eb);color:#fff;border:none;}
+.package-card.enterprise{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border:none;}
+
+.package-card::after{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;
+  border-radius:50%;opacity:.12;}
+.package-card.starter::after{background:#2563eb;}
+.package-card.pro::after{background:#fff;}
+.package-card.enterprise::after{background:#fbbf24;}
+
+.pkg-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;
+  font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:16px;}
+.pkg-badge.starter-b{background:#dbeafe;color:#1d4ed8;}
+.pkg-badge.pro-b{background:rgba(255,255,255,0.2);color:#fff;}
+.pkg-badge.enterprise-b{background:rgba(251,191,36,0.2);color:#fbbf24;}
+
+.pkg-name{font-size:22px;font-weight:900;margin-bottom:4px;}
+.pkg-desc{font-size:13.5px;opacity:.8;margin-bottom:24px;line-height:1.6;}
+
+.pkg-price-block{display:flex;align-items:flex-end;gap:8px;margin-bottom:8px;}
+.pkg-price{font-size:46px;font-weight:900;line-height:1;}
+.pkg-price-unit{font-size:14px;font-weight:500;opacity:.7;margin-bottom:8px;}
+.pkg-setup{font-size:12.5px;opacity:.65;margin-bottom:28px;}
+.pkg-setup strong{opacity:1;}
+
+.pkg-divider{height:1px;background:rgba(255,255,255,0.15);margin-bottom:24px;}
+.pkg-divider.dark{background:#e2e8f0;}
+
+.features-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.feature-item{display:flex;align-items:flex-start;gap:10px;padding:6px 0;}
+.feature-check{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.check-starter{background:#dbeafe;color:#2563eb;}
+.check-pro{background:rgba(255,255,255,0.2);color:#fff;}
+.check-ent{background:rgba(251,191,36,0.15);color:#fbbf24;}
+.feature-text{font-size:12.5px;line-height:1.5;}
+.feature-text.light{color:rgba(255,255,255,0.85);}
+.feature-text.dark-t{color:#334155;}
+
+.pkg-recommended{
+  position:absolute;top:20px;right:24px;
+  background:linear-gradient(90deg,#34d399,#10b981);color:#fff;
+  font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:4px 14px;border-radius:100px;
+}
+
+/* KARŞILAŞTIRMA TABLOSU */
+.compare-table{width:100%;border-collapse:collapse;margin-bottom:32px;}
+.compare-table th{padding:12px 16px;font-size:12px;font-weight:700;text-align:center;}
+.compare-table th:first-child{text-align:left;width:34%;}
+.compare-table th.starter-h{color:#2563eb;background:#eff6ff;}
+.compare-table th.pro-h{background:#2563eb;color:#fff;}
+.compare-table th.ent-h{background:#0f172a;color:#fbbf24;}
+.compare-table td{padding:10px 16px;font-size:12.5px;text-align:center;border-bottom:1px solid #f1f5f9;}
+.compare-table td:first-child{text-align:left;color:#334155;font-weight:500;}
+.compare-table tr:nth-child(even) td{background:#f8fafc;}
+.compare-table tr:nth-child(odd) td{background:#fff;}
+.compare-table .section-row td{background:#f1f5f9;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b;padding:8px 16px;}
+.check{color:#10b981;font-size:16px;font-weight:700;}
+.cross{color:#cbd5e1;font-size:16px;}
+.partial{color:#f59e0b;font-size:12px;font-weight:600;}
+
+/* SÜRECİ */
+.process-steps{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;}
+.step{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px 22px;}
+.step-num{width:32px;height:32px;border-radius:8px;background:#2563eb;color:#fff;
+  font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-bottom:12px;}
+.step h4{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:4px;}
+.step p{font-size:12px;color:#64748b;line-height:1.6;}
+.step-duration{font-size:10.5px;color:#2563eb;font-weight:600;margin-top:8px;}
+
+/* SSS */
+.faq-item{border-bottom:1px solid #f1f5f9;padding:16px 0;}
+.faq-item:last-child{border-bottom:none;}
+.faq-q{font-size:13.5px;font-weight:700;color:#1e293b;margin-bottom:6px;}
+.faq-a{font-size:12.5px;color:#475569;line-height:1.65;}
+
+/* CALLOUT */
+.callout{border-radius:12px;padding:18px 22px;margin-bottom:20px;display:flex;gap:14px;}
+.callout.blue{background:#eff6ff;border:1px solid #bfdbfe;}
+.callout.green{background:#f0fdf4;border:1px solid #bbf7d0;}
+.callout.orange{background:#fffbeb;border:1px solid #fde68a;}
+.callout-icon{font-size:20px;flex-shrink:0;line-height:1.4;}
+.callout h4{font-size:13px;font-weight:700;color:#1e293b;margin-bottom:3px;}
+.callout p{font-size:12px;color:#475569;line-height:1.65;}
+
+.divider{height:1px;background:linear-gradient(90deg,#e2e8f0,transparent);margin:28px 0;}
+
+/* KAPANIŞ */
+.closing{
+  background:linear-gradient(150deg,#0f172a 0%,#1e3a8a 50%,#2563eb 100%);
+  min-height:70vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:80px 60px;page-break-before:always;text-align:center;
+}
+.closing h2{font-size:40px;font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:16px;}
+.closing p{font-size:17px;color:#93c5fd;max-width:460px;line-height:1.6;margin-bottom:44px;}
+.cta-box{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);
+  border-radius:14px;padding:28px 40px;max-width:480px;width:100%;}
+.cta-item{display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid rgba(255,255,255,0.1);}
+.cta-item:last-child{border-bottom:none;}
+.cta-label{font-size:13px;color:#e2e8f0;flex:1;text-align:left;}
+.cta-val{font-size:13px;color:#60a5fa;font-weight:600;}
+
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+
+<!-- KAPAK -->
+<div class="cover">
+  <div class="cover-logo">⚡ CMS Panel</div>
+  <h1>Web Sitenizi<br/><em>Sizin Yerinize</em><br/>Yönetelim</h1>
+  <p class="cover-sub">Restoranlar, klinikler ve yerel işletmeler için profesyonel web sitesi ve dijital varlık yönetim hizmeti.</p>
+
+  <div class="cover-cards">
+    <div class="cover-card">
+      <span class="cover-card-price">₺2.990</span>
+      <span class="cover-card-name">Başlangıç</span>
+      <span class="cover-card-badge">/ ay</span>
+    </div>
+    <div class="cover-card" style="background:rgba(37,99,235,0.35);border-color:rgba(96,165,250,0.5);">
+      <span class="cover-card-price">₺5.990</span>
+      <span class="cover-card-name">Profesyonel</span>
+      <span class="cover-card-badge" style="background:rgba(52,211,153,0.2);color:#6ee7b7;">En Popüler</span>
+    </div>
+    <div class="cover-card" style="background:rgba(255,255,255,0.08);border-color:rgba(251,191,36,0.3);">
+      <span class="cover-card-price" style="color:#fbbf24;">₺11.990</span>
+      <span class="cover-card-name">Kurumsal</span>
+      <span class="cover-card-badge">/ ay</span>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:560px;">
+    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#e0f2fe;font-size:12px;padding:5px 14px;border-radius:6px;">✓ KDV dahil net fiyat</span>
+    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#e0f2fe;font-size:12px;padding:5px 14px;border-radius:6px;">✓ Aylık sözleşme, yıllık indirim</span>
+    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#e0f2fe;font-size:12px;padding:5px 14px;border-radius:6px;">✓ Kurulum ücreti ayrıdır</span>
+    <span style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#e0f2fe;font-size:12px;padding:5px 14px;border-radius:6px;">✓ İlk ay para iade garantisi</span>
+  </div>
+
+  <div class="cover-footer">cms-panel.app · Nisan 2026</div>
+</div>
+
+
+<!-- NEDEN CMS PANEL? -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Neden Biz?</div>
+<h2 class="sec-title">İşinize Odaklanın,<br/>Web Sitenizi Bize Bırakın</h2>
+<p class="sec-desc">Çoğu işletme sahibi web sitelerini güncellemek için ya pahalı ajans faturası öder, ya da aylar boyunca eski içeriklerle kalır. Biz bu ikisi arasındaki boşluğu kapatıyoruz.</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;">
+  <div style="background:#fff1f2;border:1px solid #fecaca;border-radius:12px;padding:22px;">
+    <div style="font-size:22px;margin-bottom:10px;">😓</div>
+    <h3 style="font-size:14px;font-weight:700;color:#991b1b;margin-bottom:8px;">Geleneksel Yöntemde Sorunlar</h3>
+    <ul style="list-style:none;font-size:12.5px;color:#7f1d1d;line-height:1.7;">
+      <li>✗ Her güncelleme için ajana para ödemek</li>
+      <li>✗ Haftalarca bekleme süreleri</li>
+      <li>✗ Kendiniz yapamıyorsunuz çünkü teknik</li>
+      <li>✗ SEO ne oluyor bilmiyorsunuz</li>
+      <li>✗ Rezervasyonlar kaybolup gidiyor</li>
+      <li>✗ Sitenizin mobilde nasıl göründüğünü<br/>&nbsp;&nbsp; bile bilmiyorsunuz</li>
+    </ul>
+  </div>
+  <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:22px;">
+    <div style="font-size:22px;margin-bottom:10px;">✨</div>
+    <h3 style="font-size:14px;font-weight:700;color:#14532d;margin-bottom:8px;">CMS Panel ile Farklılık</h3>
+    <ul style="list-style:none;font-size:12.5px;color:#166534;line-height:1.7;">
+      <li>✓ İçeriklerinizi kendiniz güncelleyebilirsiniz</li>
+      <li>✓ Anında yayına alın, 7/24 erişim</li>
+      <li>✓ Kod bilgisi gerektirmiyor</li>
+      <li>✓ SEO her sayfada otomatik yönetilir</li>
+      <li>✓ Rezervasyonlar panelde görünür, SMS/email</li>
+      <li>✓ Mobil, tablet, masaüstü — her cihazda mükemmel</li>
+    </ul>
+  </div>
+</div>
+
+<div class="callout blue">
+  <span class="callout-icon">🍽️</span>
+  <div>
+    <h4>İlk Müşterimiz: Gusto Kartepe Restoran</h4>
+    <p>Gusto Kartepe, menüsünü her hafta güncellemek, rezervasyon taleplerini takip etmek ve Google'da üst sıralarda çıkmak için CMS Panel'i tercih etti. Artık tüm bu işlemler tek ekrandan, dakikalar içinde halloluyor.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- PAKET 1: BAŞLANGIÇ -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Paket 1</div>
+
+<div class="package-card starter">
+  <div class="pkg-badge starter-b">🌱 Başlangıç Paketi</div>
+  <div class="pkg-name" style="color:#1e293b;">Başlangıç</div>
+  <div class="pkg-desc" style="color:#64748b;">Dijital dünyaya adım atmak isteyen küçük işletmeler için temel web sitesi çözümü.</div>
+
+  <div class="pkg-price-block">
+    <span class="pkg-price" style="color:#2563eb;">₺2.990</span>
+    <span class="pkg-price-unit" style="color:#64748b;">/ ay  <span style="font-size:11px;">(KDV dahil)</span></span>
+  </div>
+  <div class="pkg-setup" style="color:#64748b;">+ <strong style="color:#1e293b;">₺4.990</strong> tek seferlik kurulum ücreti</div>
+
+  <div class="pkg-divider dark"></div>
+
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">1 web sitesi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">5 sayfa (statik)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Türkçe içerik yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Medya kütüphanesi (10 GB)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Temel SEO (meta title/desc)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">SSL sertifikası</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Mobil uyumlu tasarım</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Email destek (48 saat)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Aylık 1 içerik revizyonu</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-starter">✓</div>
+      <span class="feature-text dark-t">Dark / Light mod</span>
+    </div>
+    <div class="feature-item" style="opacity:.4;">
+      <div class="feature-check" style="background:#f1f5f9;color:#94a3b8;">✗</div>
+      <span class="feature-text" style="color:#94a3b8;">Restoran modülü</span>
+    </div>
+    <div class="feature-item" style="opacity:.4;">
+      <div class="feature-check" style="background:#f1f5f9;color:#94a3b8;">✗</div>
+      <span class="feature-text" style="color:#94a3b8;">Rezervasyon takibi</span>
+    </div>
+    <div class="feature-item" style="opacity:.4;">
+      <div class="feature-check" style="background:#f1f5f9;color:#94a3b8;">✗</div>
+      <span class="feature-text" style="color:#94a3b8;">Tam SEO yönetimi</span>
+    </div>
+    <div class="feature-item" style="opacity:.4;">
+      <div class="feature-check" style="background:#f1f5f9;color:#94a3b8;">✗</div>
+      <span class="feature-text" style="color:#94a3b8;">İngilizce içerik</span>
+    </div>
+  </div>
+</div>
+
+<div class="callout orange">
+  <span class="callout-icon">💬</span>
+  <div>
+    <h4>Başlangıç Paketi Kime Uygun?</h4>
+    <p>Dijitale yeni adım atan ve önce temel bir web varlığı oluşturmak isteyen işletmelere idealdir. İhtiyaçlar büyüdükçe Profesyonel pakete geçiş her zaman mümkündür ve mevcut içerikler taşınır.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- PAKET 2: PROFESYONEL -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Paket 2 — En Popüler</div>
+
+<div class="package-card pro">
+  <div class="pkg-recommended">⭐ En Çok Tercih Edilen</div>
+  <div class="pkg-badge pro-b">🚀 Profesyonel Paket</div>
+  <div class="pkg-name">Profesyonel</div>
+  <div class="pkg-desc">Restoran ve orta ölçekli işletmeler için tam özellikli dijital yönetim platformu.</div>
+
+  <div class="pkg-price-block">
+    <span class="pkg-price">₺5.990</span>
+    <span class="pkg-price-unit">/ ay  <span style="font-size:11px;">(KDV dahil)</span></span>
+  </div>
+  <div class="pkg-setup">+ <strong>₺9.990</strong> tek seferlik kurulum ücreti</div>
+
+  <div class="pkg-divider"></div>
+
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">1 web sitesi, sınırsız sayfa</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">TR + EN çift dil içerik</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">Medya kütüphanesi (50 GB)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">🍽️ Restoran menü yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">📅 Rezervasyon takip paneli</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">📋 İletişim form yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">🔍 Tam SEO yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">Open Graph + Twitter Card</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">JSON-LD Structured Data</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">Sitemap + robots.txt</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">URL Redirect yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">Navigasyon menü yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">3 kullanıcı hesabı</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">WhatsApp + email destek</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">Aylık 3 içerik revizyonu</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-pro">✓</div>
+      <span class="feature-text light">Aylık performans raporu</span>
+    </div>
+  </div>
+</div>
+
+<div class="callout green">
+  <span class="callout-icon">🍽️</span>
+  <div>
+    <h4>Gusto Kartepe Bu Paketi Kullanıyor</h4>
+    <p>Restoran menüsünü her hafta kolayca güncelliyor, rezervasyon taleplerini tek ekranda görüyor, Google'daki SEO performansını takip ediyor. Tüm bunlar kod bilgisi olmadan, panelden birkaç tıkla.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- PAKET 3: KURUMSAL -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Paket 3</div>
+
+<div class="package-card enterprise">
+  <div class="pkg-badge enterprise-b">🏆 Kurumsal Paket</div>
+  <div class="pkg-name" style="color:#fbbf24;">Kurumsal</div>
+  <div class="pkg-desc">Birden fazla şubesi olan veya tam dijital yönetim ortaklığı isteyen büyük işletmeler için.</div>
+
+  <div class="pkg-price-block">
+    <span class="pkg-price" style="color:#fbbf24;">₺11.990</span>
+    <span class="pkg-price-unit" style="color:rgba(255,255,255,0.6);">/ ay  <span style="font-size:11px;">(KDV dahil)</span></span>
+  </div>
+  <div class="pkg-setup" style="color:rgba(255,255,255,0.5);">+ <strong style="color:rgba(255,255,255,0.8);">₺19.990</strong> tek seferlik kurulum ücreti</div>
+
+  <div class="pkg-divider"></div>
+
+  <div class="features-grid">
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light"><strong>3 web sitesi</strong> (3 şube/marka)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Profesyonel'deki her şey</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Sınırsız kullanıcı hesabı</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Medya kütüphanesi (200 GB)</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Özel rol ve yetki yönetimi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Öncelikli WhatsApp destek</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Aylık 5 saat özel geliştirme</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Sınırsız içerik revizyonu</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Aylık strateji görüşmesi</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">Haftalık performans raporu</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">TR + EN + 3. dil desteği</span>
+    </div>
+    <div class="feature-item">
+      <div class="feature-check check-ent">✓</div>
+      <span class="feature-text light">SLA garantisi (%99.5 uptime)</span>
+    </div>
+  </div>
+</div>
+
+<div class="callout blue">
+  <span class="callout-icon">📞</span>
+  <div>
+    <h4>Kurumsal Paket için Özel Teklif Alın</h4>
+    <p>3'ten fazla site veya özel entegrasyon (POS sistemi, rezervasyon platformu, Google Maps API) ihtiyacınız varsa, ihtiyaçlarınıza özel fiyatlandırma yapıyoruz. Bir görüşme ayarlayalım.</p>
+  </div>
+</div>
+
+<div class="callout green">
+  <span class="callout-icon">💰</span>
+  <div>
+    <h4>Yıllık Ödeme İndirimi</h4>
+    <p>Tüm paketlerde <strong>yıllık ödeme seçeneği</strong> mevcuttur. 12 ay peşin ödeme yapıldığında <strong>2 ay ücretsiz</strong> (≈ %16 indirim). Örnek: Profesyonel paket yıllık = ₺59,900 (aylık ₺4,992).</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- KARŞILAŞTIRMA TABLOSU -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Paket Karşılaştırması</div>
+<h2 class="sec-title">Hangi Paket Size Uygun?</h2>
+<p class="sec-desc">Üç paketin özelliklerini yan yana karşılaştırın ve ihtiyacınıza en uygun seçeneği belirleyin.</p>
+
+<table class="compare-table">
+  <thead>
+    <tr>
+      <th style="background:#f8fafc;">Özellik</th>
+      <th class="starter-h">🌱 Başlangıç<br/><span style="font-weight:400;font-size:11px;">₺2.990/ay</span></th>
+      <th class="pro-h">🚀 Profesyonel<br/><span style="font-weight:400;font-size:11px;">₺5.990/ay</span></th>
+      <th class="ent-h">🏆 Kurumsal<br/><span style="font-weight:400;font-size:11px;">₺11.990/ay</span></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="section-row"><td colspan="4">Web Sitesi</td></tr>
+    <tr><td>Web sitesi sayısı</td><td>1</td><td>1</td><td>3</td></tr>
+    <tr><td>Sayfa limiti</td><td>5 sayfa</td><td>Sınırsız</td><td>Sınırsız</td></tr>
+    <tr><td>Dil desteği</td><td>Türkçe</td><td>TR + EN</td><td>TR + EN + 3. dil</td></tr>
+    <tr><td>Medya depolama</td><td>10 GB</td><td>50 GB</td><td>200 GB</td></tr>
+
+    <tr class="section-row"><td colspan="4">İçerik & Yönetim</td></tr>
+    <tr><td>İçerik editörü</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Medya kütüphanesi</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Navigasyon yönetimi</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Dark / Light mod</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+
+    <tr class="section-row"><td colspan="4">Restoran Modülü</td></tr>
+    <tr><td>Menü kategorileri & ürünler</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Rezervasyon takibi</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Form gönderileri</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+
+    <tr class="section-row"><td colspan="4">SEO</td></tr>
+    <tr><td>Meta title / description</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Open Graph / Social SEO</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>JSON-LD Schema</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Sitemap + robots.txt</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Redirect yönetimi</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+
+    <tr class="section-row"><td colspan="4">Kullanıcı & Destek</td></tr>
+    <tr><td>Kullanıcı hesabı</td><td>1</td><td>3</td><td>Sınırsız</td></tr>
+    <tr><td>Özel roller</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Email desteği</td><td>48 saat</td><td>24 saat</td><td>Öncelikli</td></tr>
+    <tr><td>WhatsApp desteği</td><td><span class="cross">—</span></td><td><span class="check">✓</span></td><td><span class="check">✓</span></td></tr>
+    <tr><td>Aylık revizyon</td><td>1</td><td>3</td><td>Sınırsız</td></tr>
+    <tr><td>Özel geliştirme</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td>5 saat/ay</td></tr>
+    <tr><td>Strateji görüşmesi</td><td><span class="cross">—</span></td><td><span class="cross">—</span></td><td>Aylık</td></tr>
+
+    <tr class="section-row"><td colspan="4">Fiyat</td></tr>
+    <tr><td>Aylık ücret</td><td style="color:#2563eb;font-weight:700;">₺2.990</td><td style="color:#2563eb;font-weight:700;">₺5.990</td><td style="color:#b45309;font-weight:700;">₺11.990</td></tr>
+    <tr><td>Kurulum ücreti</td><td>₺4.990</td><td>₺9.990</td><td>₺19.990</td></tr>
+    <tr><td>Yıllık ödeme</td><td>₺29.900/yıl<br/><span style="color:#15803d;font-size:11px;">2 ay ücretsiz</span></td><td>₺59.900/yıl<br/><span style="color:#15803d;font-size:11px;">2 ay ücretsiz</span></td><td>₺119.900/yıl<br/><span style="color:#15803d;font-size:11px;">2 ay ücretsiz</span></td></tr>
+  </tbody>
+</table>
+
+</div>
+</div>
+
+
+<!-- ONBOARDING SÜRECİ & SSS -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Nasıl Başlarız?</div>
+<h2 class="sec-title">4 Adımda Siteniz Yayında</h2>
+<p class="sec-desc">Anlaşmadan canlıya geçişe kadar ortalama 7–14 iş günü.</p>
+
+<div class="process-steps">
+  <div class="step">
+    <div class="step-num">1</div>
+    <h4>Keşif Görüşmesi</h4>
+    <p>İşletmenizi, hedeflerinizi ve beklentilerinizi konuşuyoruz. Hangi paket size uygun, belirliyoruz. Ücretsiz.</p>
+    <div class="step-duration">⏱ 30–45 dakika · Zoom veya yüz yüze</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <h4>Sözleşme & Ödeme</h4>
+    <p>Dijital hizmet sözleşmesi imzalanır, kurulum ücreti ve ilk ay ödemesi alınır. Projeniz başlar.</p>
+    <div class="step-duration">⏱ 1–2 iş günü</div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <h4>Kurulum & Tasarım</h4>
+    <p>Sitenizin şablonu hazırlanır, domain bağlanır, marka renkleri ve logo sisteme yüklenir. İçerik girişi yapılır.</p>
+    <div class="step-duration">⏱ 5–10 iş günü</div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <h4>Eğitim & Yayın</h4>
+    <p>Paneli nasıl kullanacağınızı gösteriyoruz (30 dk). Onayınızın ardından site canlıya alınır.</p>
+    <div class="step-duration">⏱ 1–2 iş günü</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="sec-label">Sık Sorulan Sorular</div>
+
+<div class="faq-item">
+  <div class="faq-q">Siteyi kendim güncelleyebilir miyim?</div>
+  <div class="faq-a">Evet. Panel tamamen Türkçedir ve kod bilgisi gerektirmez. Menü eklemek, fiyat güncellemek, fotoğraf yüklemek gibi işlemler birkaç tıkla yapılır. Eğitimde tüm işlevleri birlikte gösteriyoruz.</div>
+</div>
+<div class="faq-item">
+  <div class="faq-q">Alan adım (domain) yoksa ne yapacağım?</div>
+  <div class="faq-a">Kurulum paketine dahil olarak alan adı temin edip sistemize bağlıyoruz. Zaten bir alan adınız varsa DNS ayarlarını biz yapıyoruz.</div>
+</div>
+<div class="faq-item">
+  <div class="faq-q">Mevcut web sitem varsa içerikler taşınır mı?</div>
+  <div class="faq-a">Evet. Mevcut metin içeriklerinizi ve görsellerinizi yeni sisteme aktarıyoruz. Bu aktarım kurulum süresine dahildir.</div>
+</div>
+<div class="faq-item">
+  <div class="faq-q">İptal edersem ne olur?</div>
+  <div class="faq-a">Aylık sözleşmelerde bir sonraki faturalandırma dönemine kadar iptal edebilirsiniz. Tüm içerik ve görseller size teslim edilir. Kurulum ücreti iade edilmez.</div>
+</div>
+<div class="faq-item">
+  <div class="faq-q">Site hızı ve teknik performans nasıl?</div>
+  <div class="faq-a">Frontend Vercel'in global CDN ağında çalışır; Türkiye dahil tüm dünyada hızlı yüklenir. SSL, HTTP/2, sıkıştırma ve önbelleğe alma varsayılan olarak aktiftir. Google Core Web Vitals'ta "İyi" puanı hedefliyoruz.</div>
+</div>
+<div class="faq-item">
+  <div class="faq-q">İlk ay memnun kalmassam?</div>
+  <div class="faq-a">İlk 30 gün içinde herhangi bir nedenle memnun kalmazsanız aylık ücreti iade ediyoruz. Kurulum ücreti iade kapsamı dışındadır.</div>
+</div>
+
+</div>
+</div>
+
+
+<!-- KAPANIŞ -->
+<div class="closing">
+  <div style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);color:#bfdbfe;
+    font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;
+    border-radius:100px;margin-bottom:32px;">Hemen Başlayalım</div>
+  <h2>Siteniz <em style="font-style:normal;background:linear-gradient(90deg,#34d399,#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">14 Gün İçinde</em><br/>Canlıda Olabilir</h2>
+  <p>Ücretsiz keşif görüşmesi için bize ulaşın. Hangi paketin size uygun olduğunu birlikte belirleyelim.</p>
+
+  <div class="cta-box">
+    <div class="cta-item">
+      <span style="font-size:18px;">📧</span>
+      <span class="cta-label">E-posta</span>
+      <span class="cta-val">info@cms-panel.app</span>
+    </div>
+    <div class="cta-item">
+      <span style="font-size:18px;">💬</span>
+      <span class="cta-label">WhatsApp</span>
+      <span class="cta-val">+90 5XX XXX XX XX</span>
+    </div>
+    <div class="cta-item">
+      <span style="font-size:18px;">🌐</span>
+      <span class="cta-label">Web</span>
+      <span class="cta-val">cms-panel.app</span>
+    </div>
+    <div class="cta-item">
+      <span style="font-size:18px;">📍</span>
+      <span class="cta-label">İlk görüşme</span>
+      <span class="cta-val">Ücretsiz · Zoom veya yüz yüze</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

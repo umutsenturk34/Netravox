@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CMS Panel — Sistem Tanıtım Dokümanı</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: #0f172a;
+    background: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ─── KAPAK SAYFASI ─── */
+  .cover {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #2563eb 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px;
+    page-break-after: always;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(99,179,237,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; left: -150px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .cover-badge {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: #bfdbfe;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 18px;
+    border-radius: 100px;
+    margin-bottom: 36px;
+  }
+
+  .cover h1 {
+    font-size: 58px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 16px;
+  }
+
+  .cover h1 span {
+    background: linear-gradient(90deg, #60a5fa, #34d399);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .cover-sub {
+    font-size: 20px;
+    color: #93c5fd;
+    text-align: center;
+    font-weight: 400;
+    max-width: 520px;
+    line-height: 1.5;
+    margin-bottom: 56px;
+  }
+
+  .cover-stats {
+    display: flex;
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+
+  .cover-stat {
+    text-align: center;
+  }
+
+  .cover-stat-num {
+    font-size: 36px;
+    font-weight: 800;
+    color: #fff;
+    display: block;
+    line-height: 1;
+  }
+
+  .cover-stat-label {
+    font-size: 12px;
+    color: #93c5fd;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 4px;
+  }
+
+  .cover-divider {
+    width: 1px;
+    height: 50px;
+    background: rgba(255,255,255,0.2);
+    align-self: center;
+  }
+
+  .cover-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .cover-tag {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #e0f2fe;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 14px;
+    border-radius: 6px;
+  }
+
+  .cover-footer {
+    position: absolute;
+    bottom: 40px;
+    left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,0.35);
+    font-size: 11px;
+  }
+
+  /* ─── SAYFA YAPISI ─── */
+  .page {
+    padding: 72px 64px;
+    page-break-before: always;
+    max-width: 100%;
+  }
+
+  .page-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* ─── BÖLÜM BAŞLIKLARI ─── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #2563eb;
+    margin-bottom: 8px;
+  }
+
+  .section-title {
+    font-size: 30px;
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.2;
+    letter-spacing: -0.5px;
+    margin-bottom: 12px;
+  }
+
+  .section-desc {
+    font-size: 15px;
+    color: #475569;
+    max-width: 600px;
+    line-height: 1.7;
+    margin-bottom: 40px;
+  }
+
+  /* ─── HERO BLOK ─── */
+  .hero-block {
+    background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%);
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+    padding: 40px 48px;
+    margin-bottom: 40px;
+  }
+
+  .hero-block h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: #1e40af;
+    margin-bottom: 12px;
+  }
+
+  .hero-block p {
+    font-size: 15px;
+    color: #334155;
+    line-height: 1.75;
+  }
+
+  /* ─── FEATURE GRID ─── */
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .feature-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s;
+  }
+
+  .feature-card.accent-blue { border-left: 3px solid #2563eb; }
+  .feature-card.accent-green { border-left: 3px solid #10b981; }
+  .feature-card.accent-purple { border-left: 3px solid #8b5cf6; }
+  .feature-card.accent-orange { border-left: 3px solid #f59e0b; }
+  .feature-card.accent-red { border-left: 3px solid #ef4444; }
+  .feature-card.accent-teal { border-left: 3px solid #0f766e; }
+
+  .feature-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+
+  .icon-blue { background: #eff6ff; }
+  .icon-green { background: #f0fdf4; }
+  .icon-purple { background: #faf5ff; }
+  .icon-orange { background: #fffbeb; }
+  .icon-red { background: #fef2f2; }
+  .icon-teal { background: #f0fdfa; }
+
+  .feature-card h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+  }
+
+  .feature-card p {
+    font-size: 12.5px;
+    color: #64748b;
+    line-height: 1.65;
+  }
+
+  /* ─── BÜYÜK ÖZELLIK KARTI ─── */
+  .big-feature {
+    border-radius: 14px;
+    padding: 32px 36px;
+    margin-bottom: 24px;
+  }
+
+  .big-feature.blue-bg {
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    color: #fff;
+  }
+
+  .big-feature.green-bg {
+    background: linear-gradient(135deg, #065f46, #059669);
+    color: #fff;
+  }
+
+  .big-feature.purple-bg {
+    background: linear-gradient(135deg, #4c1d95, #7c3aed);
+    color: #fff;
+  }
+
+  .big-feature h3 {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: inherit;
+  }
+
+  .big-feature p {
+    font-size: 13px;
+    opacity: 0.85;
+    line-height: 1.7;
+  }
+
+  .big-feature ul {
+    margin-top: 16px;
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .big-feature ul li {
+    font-size: 12.5px;
+    opacity: 0.9;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .big-feature ul li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    font-weight: 700;
+    opacity: 0.8;
+  }
+
+  /* ─── TABLO ─── */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+
+  .info-table thead tr {
+    background: linear-gradient(90deg, #1e40af, #2563eb);
+    color: #fff;
+  }
+
+  .info-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .info-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  .info-table tbody tr:nth-child(odd) {
+    background: #fff;
+  }
+
+  .info-table tbody td {
+    padding: 11px 16px;
+    font-size: 13px;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .info-table tbody td:first-child {
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* ─── EKRAN LİSTESİ ─── */
+  .screen-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+
+  .screen-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .screen-num {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .screen-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* ─── ROL TABLOSU ─── */
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .role-card {
+    border-radius: 10px;
+    padding: 16px 18px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .role-card.super { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #fbbf24; }
+  .role-card.agency { background: linear-gradient(135deg, #ede9fe, #ddd6fe); border-color: #a78bfa; }
+  .role-card.company { background: linear-gradient(135deg, #dcfce7, #bbf7d0); border-color: #4ade80; }
+  .role-card.seo { background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-color: #60a5fa; }
+  .role-card.content { background: linear-gradient(135deg, #e0f2fe, #bae6fd); border-color: #38bdf8; }
+  .role-card.media { background: linear-gradient(135deg, #fce7f3, #fbcfe8); border-color: #f472b6; }
+  .role-card.reservation { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-color: #86efac; }
+  .role-card.viewer { background: linear-gradient(135deg, #f1f5f9, #e2e8f0); border-color: #cbd5e1; }
+
+  .role-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+
+  .role-desc {
+    font-size: 11.5px;
+    color: #475569;
+    line-height: 1.5;
+  }
+
+  /* ─── TECH STACK ─── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .tech-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .tech-emoji {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .tech-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .tech-desc {
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  /* ─── CALLOUT ─── */
+  .callout {
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .callout.info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+  }
+
+  .callout.success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+  }
+
+  .callout.warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+  }
+
+  .callout-icon {
+    font-size: 20px;
+    flex-shrink: 0;
+    line-height: 1.4;
+  }
+
+  .callout-content h4 {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 4px;
+  }
+
+  .callout-content p {
+    font-size: 12.5px;
+    color: #475569;
+    line-height: 1.65;
+  }
+
+  /* ─── BÖLÜM AYIRICI ─── */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, #e2e8f0, transparent);
+    margin: 36px 0;
+  }
+
+  /* ─── BADGE ─── */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-blue { background: #dbeafe; color: #1d4ed8; }
+  .badge-green { background: #dcfce7; color: #15803d; }
+  .badge-orange { background: #fef3c7; color: #92400e; }
+
+  /* ─── KAPANŞ SAYFASI ─── */
+  .closing {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #2563eb 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 60px;
+    page-break-before: always;
+    text-align: center;
+  }
+
+  .closing h2 {
+    font-size: 42px;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1px;
+    margin-bottom: 16px;
+  }
+
+  .closing p {
+    font-size: 18px;
+    color: #93c5fd;
+    max-width: 480px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+  }
+
+  .closing-links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .closing-link {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #e0f2fe;
+    padding: 10px 28px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cover, .closing { -webkit-print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     KAPAK SAYFASI
+════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">Ürün Tanıtım Dokümanı · 2026</div>
+
+  <h1>Çok Firmalı<br/><span>CMS Paneli</span></h1>
+
+  <p class="cover-sub">
+    Restoranlar, klinikler ve yerel işletmeler için web sitelerini
+    tek panelden yöneten profesyonel içerik yönetim sistemi.
+  </p>
+
+  <div class="cover-stats">
+    <div class="cover-stat">
+      <span class="cover-stat-num">23</span>
+      <span class="cover-stat-label">Yönetim Ekranı</span>
+    </div>
+    <div class="cover-divider"></div>
+    <div class="cover-stat">
+      <span class="cover-stat-num">8</span>
+      <span class="cover-stat-label">Kullanıcı Rolü</span>
+    </div>
+    <div class="cover-divider"></div>
+    <div class="cover-stat">
+      <span class="cover-stat-num">13</span>
+      <span class="cover-stat-label">Veri Modeli</span>
+    </div>
+    <div class="cover-divider"></div>
+    <div class="cover-stat">
+      <span class="cover-stat-num">∞</span>
+      <span class="cover-stat-label">Firma Kapasitesi</span>
+    </div>
+  </div>
+
+  <div class="cover-tags">
+    <span class="cover-tag">React + Tailwind CSS</span>
+    <span class="cover-tag">Node.js + Express</span>
+    <span class="cover-tag">MongoDB</span>
+    <span class="cover-tag">JWT Auth</span>
+    <span class="cover-tag">Multi-Tenant</span>
+    <span class="cover-tag">RBAC</span>
+    <span class="cover-tag">S3 Medya</span>
+    <span class="cover-tag">SEO Tam Destek</span>
+    <span class="cover-tag">Dark / Light Mode</span>
+    <span class="cover-tag">TR + EN</span>
+  </div>
+
+  <div class="cover-footer">cms-panel.app · Tüm hakları saklıdır</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     1. SİSTEM NEDİR?
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Genel Bakış</div>
+  <h2 class="section-title">Sistem Nedir, Kime Yarar?</h2>
+  <p class="section-desc">
+    CMS Panel; web ajanslarının müşteri işletmeler adına web sitelerini
+    oluşturmasını, içerikleri kolayca güncellemesini ve her firmaya özel
+    yetki seviyelerinde yönetmesini sağlayan çok firmalı bir içerik yönetim sistemidir.
+  </p>
+
+  <div class="hero-block">
+    <h2>Tek Panel, Sonsuz Firma</h2>
+    <p>
+      Sisteme eklenen her firma kendi web sitesinin tüm içeriklerini — sayfalar,
+      görseller, menüler, rezervasyonlar, SEO ayarları — tamamen bağımsız olarak
+      yönetir. Firmalar birbirinin verilerini asla göremez; izolasyon backend
+      altyapı seviyesinde güvence altındadır. Ajans, tüm firmaları tek bir
+      süper yönetici hesabından denetleyebilir.
+    </p>
+  </div>
+
+  <div class="feature-grid">
+    <div class="feature-card accent-blue">
+      <div class="feature-icon icon-blue">🏢</div>
+      <h3>Web Ajansları için</h3>
+      <p>Onlarca müşteri firmanın web sitesini tek panelden yönetin. Her firmaya farklı kullanıcı ve yetki seviyesi tanımlayın.</p>
+    </div>
+    <div class="feature-card accent-green">
+      <div class="feature-icon icon-green">🍽️</div>
+      <h3>Restoran İşletmeleri için</h3>
+      <p>Menü kategorileri ve ürünleri, rezervasyon talepleri, galeri, güncel fiyatlar — tamamı kod bilgisi gerekmeden.</p>
+    </div>
+    <div class="feature-card accent-purple">
+      <div class="feature-icon icon-purple">🦷</div>
+      <h3>Klinik & Sağlık Sektörü için</h3>
+      <p>Hizmet sayfaları, doktor tanıtımları, randevu form yönetimi ve KVKK uyumlu içerik yapısı.</p>
+    </div>
+    <div class="feature-card accent-orange">
+      <div class="feature-icon icon-orange">📈</div>
+      <h3>SEO Ajansları için</h3>
+      <p>Meta title'dan JSON-LD schema'ya, sitemap'ten robots.txt'e kadar tüm SEO parametrelerine yetki bazlı erişim.</p>
+    </div>
+  </div>
+
+  <div class="callout info">
+    <span class="callout-icon">💡</span>
+    <div class="callout-content">
+      <h4>Neden "Çok Firmalı"?</h4>
+      <p>
+        Geleneksel CMS sistemleri tek site yönetir. Bu panel ise bir SaaS altyapısı olarak
+        tasarlandığından aynı kod tabanıyla sınırsız sayıda firmayı barındırabilir.
+        Her yeni müşteri saniyeler içinde sisteme eklenir, kendi kullanıcılarını atar ve
+        kendi web sitesini yönetmeye başlar.
+      </p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     2. TEMEL ÖZELLİKLER
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Temel Özellikler</div>
+  <h2 class="section-title">Ne Yapabilirsiniz?</h2>
+  <p class="section-desc">
+    Sistemin sunduğu başlıca yetenekler, kullanıcı profiline göre gruplandırılmıştır.
+  </p>
+
+  <div class="big-feature blue-bg">
+    <h3>📄 Sayfa Yönetimi & İçerik Editörü</h3>
+    <p>Her firma için özel sayfalar oluşturun, düzenleyin ve yayına alın. Sayfalar şablon sistemine dayanır; her şablon o sayfaya uygun içerik alanlarını otomatik olarak gösterir.</p>
+    <ul>
+      <li>Taslak / Yayında / Arşiv durumları</li>
+      <li>Türkçe ve İngilizce içerik sekmeleri</li>
+      <li>Otomatik SEO-dostu slug üretimi</li>
+      <li>Sayfa bazlı SEO meta alanları</li>
+      <li>8 hazır sayfa şablonu</li>
+      <li>Anlık kayıt ve önizleme</li>
+    </ul>
+  </div>
+
+  <div class="big-feature green-bg">
+    <h3>🔍 Tam SEO Yönetimi</h3>
+    <p>Ajans veya SEO uzmanlarının ihtiyaç duyduğu her parametre tek ekranda. Sayfa bazlı veya site geneli ayarlanabilir.</p>
+    <ul>
+      <li>Meta title & description (TR/EN)</li>
+      <li>Canonical URL tanımı</li>
+      <li>Robots (index / noindex)</li>
+      <li>Open Graph & Twitter Cards</li>
+      <li>JSON-LD Structured Data</li>
+      <li>Sitemap.xml & robots.txt</li>
+      <li>301 / 302 Redirect yönetimi</li>
+      <li>Hreflang dil etiketleri</li>
+    </ul>
+  </div>
+
+  <div class="big-feature purple-bg">
+    <h3>🖼️ Medya Kütüphanesi</h3>
+    <p>Görsel ve video dosyaları S3-uyumlu depolamada güvenle saklanır. Maliyet kontrolü için arşivleme ve silme stratejisi hazır gelir.</p>
+    <ul>
+      <li>Sürükle-bırak yükleme</li>
+      <li>Grid görünüm, dosya bilgileri</li>
+      <li>Alt text tanımlama (SEO + erişilebilirlik)</li>
+      <li>Arşivleme (CDN'den kaldır, kayıt kalır)</li>
+      <li>S3 silme (maliyet kontrolü)</li>
+      <li>AWS S3 / Cloudflare R2 / Backblaze B2</li>
+    </ul>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     3. RESTORAN MODÜLÜ
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Sektörel Modüller</div>
+  <h2 class="section-title">Restoran Modülü</h2>
+  <p class="section-desc">
+    Gusto Kartepe gibi restoran işletmeleri için menü yönetiminden
+    rezervasyon takibine kadar özel modüller içerir.
+  </p>
+
+  <div class="feature-grid">
+    <div class="feature-card accent-orange">
+      <div class="feature-icon icon-orange">🍕</div>
+      <h3>Menü Kategorileri</h3>
+      <p>Başlangıçlar, ana yemekler, tatlılar gibi kategoriler oluşturun. Türkçe/İngilizce ad ve açıklama, sıralama, kategori görseli.</p>
+    </div>
+    <div class="feature-card accent-green">
+      <div class="feature-icon icon-green">🥗</div>
+      <h3>Menü Ürünleri</h3>
+      <p>Her ürün için fiyat (TRY / USD / EUR), alerjen bilgisi, öne çıkan etiketler (vegan, yeni, popüler), görsel ve aktif/pasif durumu.</p>
+    </div>
+    <div class="feature-card accent-blue">
+      <div class="feature-icon icon-blue">📅</div>
+      <h3>Rezervasyon Takibi</h3>
+      <p>Müşterilerden gelen rezervasyon taleplerini görün, durumunu güncelleyin (Yeni → Onaylandı / Reddedildi). Tarih, kişi sayısı, not bilgileri.</p>
+    </div>
+    <div class="feature-card accent-teal">
+      <div class="feature-icon icon-teal">📋</div>
+      <h3>Form Gönderileri</h3>
+      <p>İletişim ve rezervasyon formlarından gelen başvuruları listeleyin, detaylarını görün, durumunu işaretleyin (Yeni / Görüldü / Yanıtlandı).</p>
+    </div>
+  </div>
+
+  <div class="callout success">
+    <span class="callout-icon">🔧</span>
+    <div class="callout-content">
+      <h4>Modüler Yapı — Diğer Sektörler de Desteklenir</h4>
+      <p>
+        Restoran modülü bu sürümde aktiftir. Aynı altyapıyla klinikler için randevu takibi,
+        perakende için ürün kataloğu, güzellik merkezleri için hizmet listesi modülleri
+        sisteme kolayca eklenebilir. Her firma sadece kendi sektörüyle ilgili modülleri görür.
+      </p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Navigasyon & Diller</div>
+  <h2 class="section-title">Web Sitesi Yapısını Kurun</h2>
+
+  <div class="feature-grid">
+    <div class="feature-card accent-blue">
+      <div class="feature-icon icon-blue">🧭</div>
+      <h3>Navigasyon Menü Yönetimi</h3>
+      <p>Ana menü, alt menüler ve footer navigasyonlarını oluşturun. Her bağlantı için etiket, URL ve sıra numarası. TR/EN ayrı menüler.</p>
+    </div>
+    <div class="feature-card accent-purple">
+      <div class="feature-icon icon-purple">🌍</div>
+      <h3>Çoklu Dil Desteği</h3>
+      <p>Türkçe ve İngilizce içerik altyapısı hazır gelir. Almanca, Fransızca, Arapça diller tek tıkla aktifleştirilebilir.</p>
+    </div>
+    <div class="feature-card accent-green">
+      <div class="feature-icon icon-green">🔀</div>
+      <h3>URL Yönlendirme (Redirect)</h3>
+      <p>Eski URL'leri yeni adreslere yönlendirin. 301 (kalıcı) veya 302 (geçici) seçeneği, aktif/pasif toggle.</p>
+    </div>
+    <div class="feature-card accent-orange">
+      <div class="feature-icon icon-orange">🎨</div>
+      <h3>Firma Marka Ayarları</h3>
+      <p>Her firma için logo URL, birincil renk, ikincil renk ve sektör bilgisi. Renk seçici + hex kodu ile hassas renk kontrolü.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     4. KULLANICI & YETKİ SİSTEMİ
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Erişim Kontrolü</div>
+  <h2 class="section-title">Kullanıcı ve Rol Yönetimi</h2>
+  <p class="section-desc">
+    8 farklı sistem rolüyle her kullanıcıya tam olarak ihtiyacı kadar yetki verilir.
+    Özel roller oluşturarak granüler izin matrisi kurulabilir.
+  </p>
+
+  <div class="role-grid">
+    <div class="role-card super">
+      <div class="role-name">⭐ Süper Admin</div>
+      <div class="role-desc">Tüm firmalar ve sistem ayarlarına tam erişim. Yeni firma oluşturur, global ayarları yönetir.</div>
+    </div>
+    <div class="role-card agency">
+      <div class="role-name">🏛️ Ajans Yöneticisi</div>
+      <div class="role-desc">Atandığı firmaların tüm yönetimini yapar. Firma ekleyemez ama firma içi her şeyi kontrol eder.</div>
+    </div>
+    <div class="role-card company">
+      <div class="role-name">🏪 Firma Yöneticisi</div>
+      <div class="role-desc">Kendi firmasının içeriklerini, kullanıcılarını ve ayarlarını yönetir.</div>
+    </div>
+    <div class="role-card seo">
+      <div class="role-name">🔍 SEO Uzmanı</div>
+      <div class="role-desc">Meta etiketler, schema, sitemap, redirect ve SEO analitiğine erişir. İçerik düzenleyemez.</div>
+    </div>
+    <div class="role-card content">
+      <div class="role-name">✏️ İçerik Editörü</div>
+      <div class="role-desc">Sayfaları oluşturur ve düzenler, yayına alabilir. Kullanıcı ve sistem ayarlarına erişemez.</div>
+    </div>
+    <div class="role-card media">
+      <div class="role-name">📸 Medya Yöneticisi</div>
+      <div class="role-desc">Görsel ve video yükler, arşivler, siler. Sayfaları düzenleyemez.</div>
+    </div>
+    <div class="role-card reservation">
+      <div class="role-name">📞 Rezervasyon Yöneticisi</div>
+      <div class="role-desc">Rezervasyon taleplerini ve form gönderilerini görür, durumlarını günceller.</div>
+    </div>
+    <div class="role-card viewer">
+      <div class="role-name">👁️ İzleyici</div>
+      <div class="role-desc">Tüm ekranlara salt okunur erişim. Hiçbir şey değiştiremez, sadece inceler.</div>
+    </div>
+  </div>
+
+  <div class="callout warning">
+    <span class="callout-icon">🔒</span>
+    <div class="callout-content">
+      <h4>Özel Rol Oluşturma</h4>
+      <p>
+        Standart roller yetmediğinde firma bazlı özel roller tanımlanabilir.
+        12 kaynak grubu (sayfalar, medya, SEO, rezervasyonlar, kullanıcılar vb.) ve
+        her grup için ayrı aksiyon izinleri (görüntüle, oluştur, düzenle, sil, yayınla)
+        kombinasyonuyla tam özelleştirme mümkündür.
+      </p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Bildirimler & Profil</div>
+
+  <div class="feature-grid">
+    <div class="feature-card accent-blue">
+      <div class="feature-icon icon-blue">🔔</div>
+      <h3>Bildirim Merkezi</h3>
+      <p>Yeni rezervasyonlar ve form gönderileri tek ekranda. Okunmamış öğeler badge ile vurgulanır, inline aksiyon butonu ile hızlı işlem yapılır.</p>
+    </div>
+    <div class="feature-card accent-teal">
+      <div class="feature-icon icon-teal">👤</div>
+      <h3>Kullanıcı Profili</h3>
+      <p>Ad güncelleme ve güvenli şifre değiştirme. Şifre değiştirildiğinde diğer tüm cihazlardaki oturumlar otomatik sonlandırılır.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     5. PANELİN 23 EKRANI
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Ekranlar</div>
+  <h2 class="section-title">23 Yönetim Ekranı</h2>
+  <p class="section-desc">
+    MVP sürümünde tüm yönetim ekranları tasarlanmış ve işlevsel hale getirilmiştir.
+  </p>
+
+  <div class="screen-list">
+    <div class="screen-item"><div class="screen-num">1</div><span class="screen-name">Giriş (Login)</span></div>
+    <div class="screen-item"><div class="screen-num">2</div><span class="screen-name">Şifremi Unuttum</span></div>
+    <div class="screen-item"><div class="screen-num">3</div><span class="screen-name">Şifre Sıfırla</span></div>
+    <div class="screen-item"><div class="screen-num">4</div><span class="screen-name">Dashboard</span></div>
+    <div class="screen-item"><div class="screen-num">5</div><span class="screen-name">Sayfalar Listesi</span></div>
+    <div class="screen-item"><div class="screen-num">6</div><span class="screen-name">Sayfa Editörü</span></div>
+    <div class="screen-item"><div class="screen-num">7</div><span class="screen-name">Medya Kütüphanesi</span></div>
+    <div class="screen-item"><div class="screen-num">8</div><span class="screen-name">Restoran Menüsü</span></div>
+    <div class="screen-item"><div class="screen-num">9</div><span class="screen-name">Rezervasyonlar</span></div>
+    <div class="screen-item"><div class="screen-num">10</div><span class="screen-name">Form Gönderileri</span></div>
+    <div class="screen-item"><div class="screen-num">11</div><span class="screen-name">SEO Yönetimi</span></div>
+    <div class="screen-item"><div class="screen-num">12</div><span class="screen-name">Redirect Yönetimi</span></div>
+    <div class="screen-item"><div class="screen-num">13</div><span class="screen-name">Navigasyon Menüleri</span></div>
+    <div class="screen-item"><div class="screen-num">14</div><span class="screen-name">Dil Ayarları</span></div>
+    <div class="screen-item"><div class="screen-num">15</div><span class="screen-name">Firma Ayarları</span></div>
+    <div class="screen-item"><div class="screen-num">16</div><span class="screen-name">Kullanıcı Yönetimi</span></div>
+    <div class="screen-item"><div class="screen-num">17</div><span class="screen-name">Rol ve Yetkiler</span></div>
+    <div class="screen-item"><div class="screen-num">18</div><span class="screen-name">Firmalar (Süper Admin)</span></div>
+    <div class="screen-item"><div class="screen-num">19</div><span class="screen-name">Bildirimler</span></div>
+    <div class="screen-item"><div class="screen-num">20</div><span class="screen-name">Profilim</span></div>
+    <div class="screen-item"><div class="screen-num">21</div><span class="screen-name">Sayfa Şablonları (8 tip)</span></div>
+    <div class="screen-item"><div class="screen-num">22</div><span class="screen-name">Dark / Light Mod</span></div>
+    <div class="screen-item"><div class="screen-num">23</div><span class="screen-name">Firma Seçici (Topbar)</span></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Sayfa Şablonları</div>
+
+  <table class="info-table">
+    <thead>
+      <tr>
+        <th>Şablon</th>
+        <th>İçerik Alanları</th>
+        <th>Kullanım Amacı</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Ana Sayfa</td>
+        <td>Hero başlık/alt başlık/görsel, CTA butonu, hakkında özet</td>
+        <td>Sitenin ana karşılama sayfası</td>
+      </tr>
+      <tr>
+        <td>Hakkımızda</td>
+        <td>Uzun metin, görsel, misyon başlık/metin</td>
+        <td>Firma hikayesi ve değerleri</td>
+      </tr>
+      <tr>
+        <td>Menü</td>
+        <td>Bölüm başlığı, giriş metni</td>
+        <td>Restoran menü sayfası (menü ayrı yönetilir)</td>
+      </tr>
+      <tr>
+        <td>Galeri</td>
+        <td>Başlık, açıklama</td>
+        <td>Görsel galeri (medya kütüphanesinden)</td>
+      </tr>
+      <tr>
+        <td>Rezervasyon</td>
+        <td>Başlık, açıklama, not/uyarı metni</td>
+        <td>Rezervasyon talep formu sayfası</td>
+      </tr>
+      <tr>
+        <td>İletişim</td>
+        <td>Adres, telefon, email, çalışma saatleri, harita embed</td>
+        <td>İletişim bilgileri ve form</td>
+      </tr>
+      <tr>
+        <td>Genel</td>
+        <td>Serbest metin içeriği</td>
+        <td>Genel amaçlı sayfa</td>
+      </tr>
+      <tr>
+        <td>Yasal</td>
+        <td>Serbest metin içeriği</td>
+        <td>KVKK, Gizlilik Politikası vb.</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     6. TEKNİK ALTYAPI & GÜVENLİK
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Teknik Altyapı</div>
+  <h2 class="section-title">Güçlü ve Güvenli Mimari</h2>
+  <p class="section-desc">
+    Modern, ölçeklenebilir ve bulut-native bir altyapı üzerine inşa edilmiştir.
+  </p>
+
+  <div class="tech-grid">
+    <div class="tech-card">
+      <span class="tech-emoji">⚛️</span>
+      <span class="tech-name">React 19 + Vite 8</span>
+      <span class="tech-desc">Hızlı, modern frontend</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🎨</span>
+      <span class="tech-name">Tailwind CSS 4</span>
+      <span class="tech-desc">Utility-first tasarım sistemi</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🟢</span>
+      <span class="tech-name">Node.js + Express</span>
+      <span class="tech-desc">Hızlı REST API backend</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🍃</span>
+      <span class="tech-name">MongoDB + Mongoose</span>
+      <span class="tech-desc">Esnek döküman veritabanı</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🔑</span>
+      <span class="tech-name">JWT Auth</span>
+      <span class="tech-desc">Access + Refresh token sistemi</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">☁️</span>
+      <span class="tech-name">S3 Adapter</span>
+      <span class="tech-desc">AWS / R2 / Backblaze desteği</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🔷</span>
+      <span class="tech-name">React Query</span>
+      <span class="tech-desc">Sunucu durumu yönetimi</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">▲</span>
+      <span class="tech-name">Vercel</span>
+      <span class="tech-desc">Frontend hosting + CDN</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-emoji">🚂</span>
+      <span class="tech-name">Railway / Render</span>
+      <span class="tech-desc">Backend hosting</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">Güvenlik</div>
+
+  <table class="info-table">
+    <thead>
+      <tr>
+        <th>Güvenlik Katmanı</th>
+        <th>Açıklama</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Multi-tenant izolasyonu</td>
+        <td>Tüm veritabanı sorgularına backend middleware'de tenantId filtresi eklenir. Frontend'de gizleme yetmez.</td>
+      </tr>
+      <tr>
+        <td>JWT Rotation</td>
+        <td>Refresh token her kullanımda yenilenir. Eski token geçersiz olur. En fazla 5 aktif oturum tutulur.</td>
+      </tr>
+      <tr>
+        <td>Tek Kullanımlık Şifre Sıfırlama</td>
+        <td>Sıfırlama token'ı mevcut şifre hash'inin parmak izini içerir. Şifre değişince token otomatik geçersizleşir.</td>
+      </tr>
+      <tr>
+        <td>Rate Limiting</td>
+        <td>Login endpoint'ine kaba kuvvet saldırısı engeli. Genel API'ye dakika başı istek sınırı.</td>
+      </tr>
+      <tr>
+        <td>Helmet.js</td>
+        <td>HTTP güvenlik başlıkları (CSP, HSTS, X-Frame-Options vb.) otomatik uygulanır.</td>
+      </tr>
+      <tr>
+        <td>RBAC</td>
+        <td>Her API endpoint'i gerekli izin olmadan 403 döner. İzin kontrolü route seviyesinde çalışır.</td>
+      </tr>
+      <tr>
+        <td>KVKK Uyumu</td>
+        <td>Form gönderilerinde veri işleme onayı alanı. IP adresi kaydı. İletişim bilgileri şifreli aktarım.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout info">
+    <span class="callout-icon">🌙</span>
+    <div class="callout-content">
+      <h4>Dark Mode + Light Mode</h4>
+      <p>
+        Panel hem karanlık hem aydınlık temayı destekler. Sistem tercihiyle otomatik uyum sağlar,
+        kullanıcı topbar'daki toggle ile manuel geçiş yapabilir. Tercih localStorage'da saklanarak
+        her oturumda hatırlanır. iOS zoom engeli için tüm input'lar 16px minimum font boyutundadır.
+      </p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     7. DEPLOY & BAŞLARKEN
+════════════════════════════════════════ -->
+<div class="page">
+<div class="page-inner">
+
+  <div class="section-label">Canlıya Almak</div>
+  <h2 class="section-title">Deploy ve Kurulum</h2>
+  <p class="section-desc">
+    Sistem bulut platformlarına hazır olarak teslim edilir. Canlıya almak için üç adım yeterlidir.
+  </p>
+
+  <div class="feature-grid">
+    <div class="feature-card accent-blue">
+      <div class="feature-icon icon-blue">1️⃣</div>
+      <h3>.env Dosyasını Doldurun</h3>
+      <p>MongoDB bağlantı URI'si, JWT secret'ları ve S3 kimlik bilgilerini ortam değişkenlerine ekleyin. Eksik değişken varsa sistem başlamayı reddeder.</p>
+    </div>
+    <div class="feature-card accent-green">
+      <div class="feature-icon icon-green">2️⃣</div>
+      <h3>Seed Script Çalıştırın</h3>
+      <p><code>node src/seed.js</code> komutuyla 8 sistem rolü, ilk firma (Gusto Kartepe) ve süper admin hesabı otomatik oluşturulur.</p>
+    </div>
+    <div class="feature-card accent-purple">
+      <div class="feature-icon icon-purple">3️⃣</div>
+      <h3>Deploy Edin</h3>
+      <p>Frontend'i Vercel'e, backend'i Railway veya Render'a deploy edin. GitHub CI/CD entegrasyonu ile her push otomatik yayına geçer.</p>
+    </div>
+    <div class="feature-card accent-teal">
+      <div class="feature-icon icon-teal">🔗</div>
+      <h3>DNS Ayarları</h3>
+      <p>Cloudflare üzerinden alan adı yönlendirmesi ve CDN aktivasyonu yapın. HTTPS otomatik olarak sağlanır.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section-label">API Mimarisi</div>
+
+  <table class="info-table">
+    <thead>
+      <tr>
+        <th>Endpoint Grubu</th>
+        <th>İşlevler</th>
+        <th>Yetki</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>/api/auth</td>
+        <td>Giriş, çıkış, token yenileme, şifre sıfırlama, profil güncelleme</td>
+        <td>Herkese açık / Kimlik doğrulama</td>
+      </tr>
+      <tr>
+        <td>/api/pages</td>
+        <td>Sayfa listeleme, oluşturma, düzenleme, silme, yayına alma</td>
+        <td>RBAC — pages.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/media</td>
+        <td>S3 yükleme, arşivleme, silme, listeleme</td>
+        <td>RBAC — media.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/restaurant</td>
+        <td>Menü kategorileri ve ürünleri CRUD</td>
+        <td>RBAC — restaurant.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/reservations</td>
+        <td>Rezervasyon listesi ve durum güncelleme</td>
+        <td>RBAC — reservations.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/seo</td>
+        <td>SEO ayarları upsert, redirect CRUD</td>
+        <td>RBAC — seo.* / redirects.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/menus</td>
+        <td>Navigasyon menüsü CRUD, öğe yönetimi</td>
+        <td>RBAC — menus.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/forms</td>
+        <td>Form gönderileri listeleme ve durum güncelleme</td>
+        <td>RBAC — forms.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/users</td>
+        <td>Kullanıcı CRUD, rol atama</td>
+        <td>RBAC — users.* izinleri</td>
+      </tr>
+      <tr>
+        <td>/api/companies</td>
+        <td>Firma CRUD, ayar güncelleme</td>
+        <td>Süper Admin / Firma erişimi</td>
+      </tr>
+      <tr>
+        <td>/api/roles</td>
+        <td>Sistem rolleri listeleme, özel rol CRUD</td>
+        <td>Firma Yöneticisi ve üstü</td>
+      </tr>
+      <tr>
+        <td>/api/languages</td>
+        <td>Aktif diller listeleme, ekleme, silme</td>
+        <td>RBAC — languages.* izinleri</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+</div>
+
+
+<!-- ════════════════════════════════════════
+     KAPANIŞ
+════════════════════════════════════════ -->
+<div class="closing">
+  <div class="cover-badge" style="margin-bottom:32px;">Hazır · Ölçeklenebilir · Güvenli</div>
+
+  <h2>Projeye Başlamaya<br/>Hazır mısınız?</h2>
+
+  <p>
+    Kod tabanı tamamlandı, build hatasız geçiyor.<br/>
+    .env dosyasını doldurun, seed'i çalıştırın, deploy edin.
+  </p>
+
+  <div style="display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-bottom:48px;">
+    <span class="cover-tag" style="font-size:13px; padding:8px 20px;">✅ 23 Ekran Tamamlandı</span>
+    <span class="cover-tag" style="font-size:13px; padding:8px 20px;">✅ 12 API Grubu Aktif</span>
+    <span class="cover-tag" style="font-size:13px; padding:8px 20px;">✅ Build Hatasız</span>
+    <span class="cover-tag" style="font-size:13px; padding:8px 20px;">✅ Deploy'a Hazır</span>
+  </div>
+
+  <div style="text-align:center; color:rgba(255,255,255,0.3); font-size:12px; margin-top:auto;">
+    CMS Panel · 2026 · Tüm hakları saklıdır
+  </div>
+</div>
+
+</body>
+</html>

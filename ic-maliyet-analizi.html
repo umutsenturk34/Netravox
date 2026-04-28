@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',-apple-system,sans-serif;color:#0f172a;background:#fff;font-size:13.5px;line-height:1.6;}
+
+/* KAPAK */
+.cover{
+  width:100%;min-height:100vh;
+  background:linear-gradient(135deg,#0f172a 0%,#1e293b 55%,#0f4c75 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 60px;page-break-after:always;position:relative;overflow:hidden;
+}
+.cover::before{content:'';position:absolute;top:-180px;right:-180px;width:500px;height:500px;
+  background:radial-gradient(circle,rgba(234,179,8,0.12) 0%,transparent 70%);border-radius:50%;}
+.cover::after{content:'';position:absolute;bottom:-140px;left:-140px;width:450px;height:450px;
+  background:radial-gradient(circle,rgba(239,68,68,0.1) 0%,transparent 70%);border-radius:50%;}
+.cover-badge{background:rgba(234,179,8,0.18);border:1px solid rgba(234,179,8,0.4);color:#fde68a;
+  font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:6px 18px;
+  border-radius:100px;margin-bottom:32px;}
+.cover h1{font-size:50px;font-weight:900;color:#fff;text-align:center;line-height:1.1;
+  letter-spacing:-1.5px;margin-bottom:14px;}
+.cover h1 span{background:linear-gradient(90deg,#fbbf24,#f87171);-webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;background-clip:text;}
+.cover-sub{font-size:17px;color:#94a3b8;text-align:center;max-width:480px;line-height:1.6;margin-bottom:48px;}
+.cover-warn{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);border-radius:10px;
+  padding:14px 24px;color:#fca5a5;font-size:12px;text-align:center;max-width:520px;line-height:1.6;}
+.cover-warn strong{color:#fecaca;}
+.cover-footer{position:absolute;bottom:36px;color:rgba(255,255,255,0.25);font-size:11px;}
+
+/* SAYFA */
+.page{padding:64px 60px;page-break-before:always;}
+.page-inner{max-width:730px;margin:0 auto;}
+
+/* BAŞLIKLAR */
+.sec-label{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#dc2626;margin-bottom:6px;}
+.sec-title{font-size:27px;font-weight:800;color:#0f172a;line-height:1.2;letter-spacing:-.5px;margin-bottom:10px;}
+.sec-desc{font-size:14px;color:#475569;max-width:620px;line-height:1.7;margin-bottom:36px;}
+
+/* MALIYET TABLOSU */
+.cost-section{margin-bottom:36px;}
+.cost-section-header{
+  background:linear-gradient(90deg,#1e293b,#334155);
+  color:#fff;padding:10px 16px;border-radius:8px 8px 0 0;
+  font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.cost-table{width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-top:none;}
+.cost-table tr:nth-child(even){background:#f8fafc;}
+.cost-table tr:nth-child(odd){background:#fff;}
+.cost-table td{padding:9px 14px;font-size:12.5px;color:#334155;border-bottom:1px solid #f1f5f9;}
+.cost-table td:first-child{font-weight:600;color:#1e293b;width:38%;}
+.cost-table td:last-child{text-align:right;font-weight:700;}
+.cost-table td.green{color:#15803d;}
+.cost-table td.orange{color:#b45309;}
+.cost-table td.red{color:#dc2626;}
+.cost-table .subtotal td{background:#f0fdf4;font-weight:700;border-top:2px solid #4ade80;}
+.cost-table .subtotal td:last-child{color:#15803d;font-size:13px;}
+.cost-table .total-row td{background:linear-gradient(90deg,#0f172a,#1e293b);color:#fff;font-weight:700;font-size:13px;}
+.cost-table .total-row td:last-child{color:#fbbf24;font-size:14px;}
+
+/* SENARYO KARTLARI */
+.scenario-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+.scenario-card{border-radius:12px;padding:20px 18px;border:1px solid #e2e8f0;}
+.scenario-card.loss{background:linear-gradient(135deg,#fff1f2,#ffe4e6);border-color:#fca5a5;}
+.scenario-card.break{background:linear-gradient(135deg,#fffbeb,#fef3c7);border-color:#fde68a;}
+.scenario-card.profit{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-color:#86efac;}
+.scenario-card.big{background:linear-gradient(135deg,#eff6ff,#dbeafe);border-color:#93c5fd;}
+.s-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;}
+.s-label.red{color:#dc2626;}.s-label.orange{color:#b45309;}.s-label.green{color:#15803d;}.s-label.blue{color:#1d4ed8;}
+.s-count{font-size:28px;font-weight:900;color:#0f172a;display:block;line-height:1.1;}
+.s-sub{font-size:11px;color:#64748b;margin-bottom:14px;}
+.s-rows{border-top:1px solid rgba(0,0,0,0.08);padding-top:10px;}
+.s-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+.s-row span:first-child{font-size:11.5px;color:#475569;}
+.s-row span:last-child{font-size:12px;font-weight:700;}
+.s-row.highlight span:last-child{font-size:13px;}
+.positive{color:#15803d;}.negative{color:#dc2626;}.neutral{color:#b45309;}
+
+/* BÜYÜK TOPLAM */
+.big-total{border-radius:14px;padding:28px 32px;margin-bottom:28px;}
+.big-total.dark{background:linear-gradient(135deg,#0f172a,#1e3a8a);color:#fff;}
+.bt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.1);}
+.bt-row:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.bt-label{font-size:13px;color:#94a3b8;}
+.bt-val{font-size:14px;font-weight:700;color:#fff;}
+.bt-val.yellow{color:#fbbf24;}
+.bt-val.green{color:#4ade80;}
+.bt-val.red{color:#f87171;}
+
+/* UYARI KUTUSU */
+.callout{border-radius:10px;padding:16px 20px;margin-bottom:20px;display:flex;gap:14px;align-items:flex-start;}
+.callout.red{background:#fff1f2;border:1px solid #fecaca;}
+.callout.yellow{background:#fffbeb;border:1px solid #fde68a;}
+.callout.green{background:#f0fdf4;border:1px solid #bbf7d0;}
+.callout.blue{background:#eff6ff;border:1px solid #bfdbfe;}
+.callout-icon{font-size:18px;line-height:1.4;flex-shrink:0;}
+.callout h4{font-size:12.5px;font-weight:700;color:#1e293b;margin-bottom:3px;}
+.callout p{font-size:12px;color:#475569;line-height:1.6;}
+
+.divider{height:1px;background:linear-gradient(90deg,#e2e8f0,transparent);margin:28px 0;}
+.note{font-size:11px;color:#94a3b8;font-style:italic;margin-top:6px;}
+.tag{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:10.5px;font-weight:600;}
+.tag-red{background:#fee2e2;color:#b91c1c;}
+.tag-green{background:#dcfce7;color:#15803d;}
+.tag-blue{background:#dbeafe;color:#1d4ed8;}
+.tag-orange{background:#fef3c7;color:#92400e;}
+
+/* BREAK-EVEN */
+.be-bar{height:28px;border-radius:6px;background:#e2e8f0;margin-bottom:10px;position:relative;overflow:hidden;}
+.be-fill{height:100%;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:11px;font-weight:700;color:#fff;}
+.be-label{font-size:12px;color:#334155;margin-bottom:4px;display:flex;justify-content:space-between;}
+
+/* KAPANIŞ */
+.closing{background:linear-gradient(135deg,#0f172a,#1e293b,#0f4c75);min-height:60vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:60px;page-break-before:always;text-align:center;}
+.closing h2{font-size:34px;font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:14px;}
+.closing p{font-size:16px;color:#94a3b8;max-width:440px;line-height:1.6;}
+
+@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}
+</style>
+</head>
+<body>
+
+<!-- KAPAK -->
+<div class="cover">
+  <div class="cover-badge">🔒 Gizli — Şirket İç Belgesi</div>
+  <h1>Maliyet &amp;<br/><span>Gelir Analizi</span></h1>
+  <p class="cover-sub">CMS Panel SaaS — Aylık işletme maliyetleri, Meta reklam senaryoları, AI giderleri, vergi yükleri ve müşteri sayısına göre kâr projeksiyonu.</p>
+  <div class="cover-warn">
+    <strong>⚠ Önemli Not:</strong> Bu belgede kullanılan tüm fiyatlar tahminidir. Döviz kuru <strong>$1 = ₺38</strong> esas alınmıştır. Vergi hesaplamaları Türkiye 2026 mevzuatına göre yaklaşık değerlerdir. Kesin rakamlar için mali müşavirinize danışın.
+  </div>
+  <div class="cover-footer">Hazırlandığı Tarih: Nisan 2026 · Gizli Şirket Belgesi</div>
+</div>
+
+
+<!-- 1. ALTYAPI MALİYETLERİ -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Bölüm 1</div>
+<h2 class="sec-title">Altyapı & Teknik Maliyetler</h2>
+<p class="sec-desc">Sistemin çalışabilmesi için ödenmesi gereken sabit aylık teknik giderler. Bu maliyetler müşteri sayısından bağımsız olarak her ay ödenir.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">☁️ Hosting & Sunucu</div>
+  <table class="cost-table">
+    <tr>
+      <td>Vercel Pro</td>
+      <td>Frontend hosting, CDN, edge network. 1 takım, sınırsız deploy.</td>
+      <td>$20 / ay</td>
+      <td class="orange">≈ ₺760</td>
+    </tr>
+    <tr>
+      <td>Railway Starter</td>
+      <td>Backend Node.js sunucusu. 500 saat/ay + $0.000463/saniye compute.</td>
+      <td>$20 / ay</td>
+      <td class="orange">≈ ₺760</td>
+    </tr>
+    <tr>
+      <td>MongoDB Atlas M2</td>
+      <td>2GB RAM, 10GB disk. 1–10 müşteri için yeterli. M5'e upgrade: $25/ay.</td>
+      <td>$9 / ay</td>
+      <td class="orange">≈ ₺342</td>
+    </tr>
+    <tr>
+      <td>Cloudflare (Free)</td>
+      <td>DNS, CDN, DDoS koruması, SSL. Pro'ya upgrade ihtiyacı yok MVP için.</td>
+      <td>$0 / ay</td>
+      <td class="green">₺0</td>
+    </tr>
+    <tr>
+      <td>Cloudflare R2 Storage</td>
+      <td>İlk 10GB/ay ücretsiz. Sonrası $0.015/GB. 5 müşteri ~50GB = $0.60/ay.</td>
+      <td>~$1–15 / ay</td>
+      <td class="orange">≈ ₺200</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Hosting Alt Toplam</td>
+      <td>≈ ₺2,062 / ay</td>
+    </tr>
+  </table>
+</div>
+
+<div class="cost-section">
+  <div class="cost-section-header">📧 İletişim & Ek Araçlar</div>
+  <table class="cost-table">
+    <tr>
+      <td>Resend (Email)</td>
+      <td>Şifre sıfırlama emaili. 3.000 email/ay ücretsiz; sonrası $20/ay.</td>
+      <td>$0–20 / ay</td>
+      <td class="green">≈ ₺400 avg</td>
+    </tr>
+    <tr>
+      <td>Alan Adı (domain)</td>
+      <td>cms-panel.com.tr veya benzeri. Yıllık ~₺1.200 = aylık bölünmüş.</td>
+      <td>—</td>
+      <td class="orange">≈ ₺100 / ay</td>
+    </tr>
+    <tr>
+      <td>GitHub (Free)</td>
+      <td>Kod deposu ve CI/CD. Private repo sınırsız ücretsiz.</td>
+      <td>$0 / ay</td>
+      <td class="green">₺0</td>
+    </tr>
+    <tr>
+      <td>Monitoring (UptimeRobot)</td>
+      <td>Uptime izleme, anlık alert. 50 monitöre kadar ücretsiz.</td>
+      <td>$0 / ay</td>
+      <td class="green">₺0</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Araçlar Alt Toplam</td>
+      <td>≈ ₺500 / ay</td>
+    </tr>
+  </table>
+</div>
+
+<div class="big-total dark">
+  <div class="bt-row">
+    <span class="bt-label">Hosting & Sunucu</span>
+    <span class="bt-val">≈ ₺2,062</span>
+  </div>
+  <div class="bt-row">
+    <span class="bt-label">İletişim & Araçlar</span>
+    <span class="bt-val">≈ ₺500</span>
+  </div>
+  <div class="bt-row">
+    <span class="bt-label" style="color:#fff;font-weight:600;font-size:14px;">📦 Toplam Altyapı Maliyeti</span>
+    <span class="bt-val yellow" style="font-size:17px;">≈ ₺2,562 / ay</span>
+  </div>
+</div>
+
+<div class="callout blue">
+  <span class="callout-icon">📈</span>
+  <div>
+    <h4>Ölçeklendirme Notu</h4>
+    <p>10+ müşteriye ulaştığınızda MongoDB Atlas M5 ($25/ay ≈ ₺950), Railway Pro ($40/ay ≈ ₺1,520) ve artan R2 maliyetleriyle altyapı ≈ <strong>₺5,000–6,500/ay</strong>'a çıkabilir. 20 müşteri için hâlâ çok düşük bir oran.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- 2. AI MALİYETLERİ -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Bölüm 2</div>
+<h2 class="sec-title">AI Maliyetleri</h2>
+<p class="sec-desc">Müşteri sunumları, içerik üretimi, SEO önerileri ve geliştirme sürecinde kullanılan yapay zeka araçlarının maliyeti.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">🤖 Yapay Zeka Araçları</div>
+  <table class="cost-table">
+    <tr>
+      <td>Claude Pro (Anthropic)</td>
+      <td>İçerik yazımı, SEO metin önerileri, kod geliştirme yardımı, müşteri sunumu hazırlama. Aylık $20.</td>
+      <td>$20 / ay</td>
+      <td class="orange">≈ ₺760</td>
+    </tr>
+    <tr>
+      <td>Claude API (Kullanım Bazlı)</td>
+      <td>Panele entegre AI özellikler için (isteğe bağlı). Sonnet 4.5: $3/M token. 500K token/ay = $1.50.</td>
+      <td>$2–30 / ay</td>
+      <td class="orange">≈ ₺380 avg</td>
+    </tr>
+    <tr>
+      <td>ChatGPT Plus (Yedek)</td>
+      <td>Opsiyonel. Farklı AI modeliyle karşılaştırma veya yedek araç olarak.</td>
+      <td>$20 / ay</td>
+      <td class="orange">≈ ₺760 (opsiyonel)</td>
+    </tr>
+    <tr>
+      <td>Midjourney / DALL·E</td>
+      <td>Müşteri için görsel üretimi, sosyal medya içerikleri, sunum görselleri.</td>
+      <td>$10–30 / ay</td>
+      <td class="orange">≈ ₺570 avg (opsiyonel)</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Minimum AI Maliyeti (sadece Claude Pro)</td>
+      <td>≈ ₺760 / ay</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Ortalama AI Maliyeti (Claude Pro + API)</td>
+      <td>≈ ₺1,140 / ay</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Maksimum AI Maliyeti (tüm araçlar)</td>
+      <td>≈ ₺2,470 / ay</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout green">
+  <span class="callout-icon">💡</span>
+  <div>
+    <h4>AI'yı Gelire Dönüştürme Fırsatı</h4>
+    <p>Claude API'yi panele entegre ederek müşterilere <strong>"AI Destekli SEO Metni Üretme"</strong> gibi premium özellikler sunabilirsiniz. Bu özellik için paket fiyatına ₺500–1,000 ek ücret eklenebilir ve AI maliyeti tamamen karşılanır.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="sec-label">Bölüm 3</div>
+<h2 class="sec-title">Meta Reklam Bütçesi</h2>
+<p class="sec-desc">Müşteri edinmek için Meta (Facebook + Instagram) reklamlarına ayrılacak aylık bütçe senaryoları.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">📣 Meta Reklam Senaryoları</div>
+  <table class="cost-table">
+    <tr>
+      <td>Senaryo A — Düşük Bütçe</td>
+      <td>Hedef kitle: İstanbul restoranlar / klinikler. A/B test 2 kampanya. CPM ~₺25.</td>
+      <td>Günlük ₺150</td>
+      <td class="green">₺4,500 / ay</td>
+    </tr>
+    <tr>
+      <td>Senaryo B — Orta Bütçe</td>
+      <td>Genişletilmiş hedefleme: tüm Türkiye işletmeler. Retargeting dahil. 4 aktif kampanya.</td>
+      <td>Günlük ₺300</td>
+      <td class="orange">₺9,000 / ay</td>
+    </tr>
+    <tr>
+      <td>Senaryo C — Yüksek Bütçe</td>
+      <td>Agresif büyüme: lookalike audience, geniş hedefleme, video reklam üretimi dahil.</td>
+      <td>Günlük ₺600</td>
+      <td class="red">₺18,000 / ay</td>
+    </tr>
+    <tr>
+      <td>Beklenen CPL (Lead Başı Maliyet)</td>
+      <td>B2B SaaS için Meta'da ortalama CPL: ₺300–800. Hedef: ₺500 altı.</td>
+      <td colspan="2" style="text-align:center;color:#64748b;">—</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Tavsiye Edilen (Senaryo A ile Başla)</td>
+      <td>₺4,500 / ay</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout yellow">
+  <span class="callout-icon">⚠️</span>
+  <div>
+    <h4>Meta Reklam Stratejisi Notu</h4>
+    <p>İlk 3 ayda öğrenme fazı olduğundan dönüşüm oranları düşük çıkabilir. <strong>₺4,500/ay ile başlayın</strong>, reklam optimizasyonu yapıldıkça bütçeyi artırın. Müşteri başı yıllık değer hesaplanarak reklam bütçesi ayarlanmalıdır.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- 3. İDARİ & VERGİ MALİYETLERİ -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Bölüm 4</div>
+<h2 class="sec-title">İdari, Yasal ve Vergi Maliyetleri</h2>
+<p class="sec-desc">Türkiye'de yasal ticari faaliyet yürütmenin getirdiği zorunlu ve yarı-zorunlu giderler. Bu kalemleri göz ardı etmek kâr hesaplamalarını ciddi ölçüde yanıltır.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">🧾 Zorunlu Yasal Giderler</div>
+  <table class="cost-table">
+    <tr>
+      <td>Mali Müşavir (Muhasebeci)</td>
+      <td>Aylık beyanname, SGK bildirimi, gelir vergisi takibi, e-fatura entegrasyonu.</td>
+      <td>—</td>
+      <td class="orange">₺2,500–4,000 / ay</td>
+    </tr>
+    <tr>
+      <td>SGK (Bağ-Kur — Şahıs Şirketi)</td>
+      <td>2026 asgari ücret bazında zorunlu sigorta primi. Seçilen basamağa göre değişir.</td>
+      <td>—</td>
+      <td class="orange">₺4,800–9,000 / ay</td>
+    </tr>
+    <tr>
+      <td>Gelir Vergisi (Yıllık → Aylık)</td>
+      <td>Net kâr üzerinden dilimler: %15 (0–110K), %20 (110K–230K), %27 (230K–870K), %35 (870K+). Aşağıda senaryo analizi.</td>
+      <td>—</td>
+      <td class="red">Kâra göre değişir</td>
+    </tr>
+    <tr>
+      <td>KDV (%20)</td>
+      <td>Müşteriye yansıtılır, devlete ödenir. Net gelire etki etmez ama nakit akışını yönetmek gerekir.</td>
+      <td>—</td>
+      <td class="green">Müşteri öder</td>
+    </tr>
+    <tr>
+      <td>Damga Vergisi & Diğer</td>
+      <td>Sözleşmeler, noter işlemleri, yıllık ticaret odası aidatı vb.</td>
+      <td>—</td>
+      <td class="orange">≈ ₺300 / ay avg</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Minimum İdari Maliyet (şahıs şirketi, düşük SGK)</td>
+      <td>≈ ₺7,600 / ay</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">Ortalama İdari Maliyet</td>
+      <td>≈ ₺9,800 / ay</td>
+    </tr>
+  </table>
+</div>
+
+<div class="cost-section">
+  <div class="cost-section-header">💼 Gelir Vergisi Tahmini — Net Kâra Göre</div>
+  <table class="cost-table">
+    <tr>
+      <td>Yıllık Net Kâr: 200.000 ₺</td>
+      <td>~₺16.667/ay net kâr. İlk dilim %15 + %20.</td>
+      <td>Yıllık ~₺37,000</td>
+      <td class="orange">≈ ₺3,083 / ay</td>
+    </tr>
+    <tr>
+      <td>Yıllık Net Kâr: 500.000 ₺</td>
+      <td>~₺41.667/ay net kâr. Karma dilimler.</td>
+      <td>Yıllık ~₺116,000</td>
+      <td class="orange">≈ ₺9,667 / ay</td>
+    </tr>
+    <tr>
+      <td>Yıllık Net Kâr: 1.000.000 ₺</td>
+      <td>~₺83.333/ay net kâr. Yüksek dilimler devreye girer.</td>
+      <td>Yıllık ~₺274,000</td>
+      <td class="red">≈ ₺22,833 / ay</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout red">
+  <span class="callout-icon">🚨</span>
+  <div>
+    <h4>LTD. Şirket Avantajı — 5+ Müşteriye Gelindiğinde Değerlendirin</h4>
+    <p>Kurumlar vergisi oranı %25 (2026 itibarıyla). Şahıs şirketine kıyasla %35 üst dilimine girme riski azalır. Muhasebeci ve avukat maliyeti artar ama 500K₺+ kâr üzerinde önemli vergi tasarrufu sağlar.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- 4. TOPLAM MALİYET TABLOSU -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Bölüm 5</div>
+<h2 class="sec-title">Toplam Aylık Maliyet Özeti</h2>
+<p class="sec-desc">Tüm maliyet kalemlerinin konsolide görünümü. Reklam ve vergi hariç sabit giderler, reklam ve vergi dahil toplam giderler.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">📊 Konsolide Maliyet Tablosu</div>
+  <table class="cost-table">
+    <tr>
+      <td>🔧 Altyapı & Teknik</td>
+      <td>Vercel + Railway + MongoDB + R2 + Email + Domain</td>
+      <td>—</td>
+      <td class="orange">₺2,562 / ay</td>
+    </tr>
+    <tr>
+      <td>🤖 AI Araçları</td>
+      <td>Claude Pro + API (ortalama senaryo)</td>
+      <td>—</td>
+      <td class="orange">₺1,140 / ay</td>
+    </tr>
+    <tr>
+      <td>🧾 Muhasebeci</td>
+      <td>Aylık muhasebe hizmeti</td>
+      <td>—</td>
+      <td class="orange">₺3,000 / ay</td>
+    </tr>
+    <tr>
+      <td>🏛️ SGK (Bağ-Kur)</td>
+      <td>2026 asgari ücret üzeri zorunlu sigorta</td>
+      <td>—</td>
+      <td class="orange">₺5,500 / ay</td>
+    </tr>
+    <tr>
+      <td>📱 İnternet & Telefon</td>
+      <td>Fiber internet + mobil hat (iş amaçlı)</td>
+      <td>—</td>
+      <td class="orange">₺800 / ay</td>
+    </tr>
+    <tr>
+      <td>📋 Damga & Diğer</td>
+      <td>Sözleşmeler, noter, çeşitli</td>
+      <td>—</td>
+      <td class="orange">₺300 / ay</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">✅ Reklam &amp; Vergi Hariç Sabit Gider</td>
+      <td>₺13,302 / ay</td>
+    </tr>
+    <tr>
+      <td>📣 Meta Reklam (Senaryo A — Başlangıç)</td>
+      <td>Günlük ₺150 × 30 gün</td>
+      <td>—</td>
+      <td class="orange">₺4,500 / ay</td>
+    </tr>
+    <tr class="subtotal">
+      <td colspan="3">✅ Reklam Dahil, Vergi Hariç Toplam Gider</td>
+      <td>₺17,802 / ay</td>
+    </tr>
+    <tr class="total-row">
+      <td colspan="3">⚠ Gelir vergisi gelire göre eklenmeli (aşağıdaki tabloya bakın)</td>
+      <td style="color:#fbbf24;">+ Vergi Dilimlerine Göre</td>
+    </tr>
+  </table>
+</div>
+
+<div class="callout blue">
+  <span class="callout-icon">🎯</span>
+  <div>
+    <h4>Break-Even Noktası</h4>
+    <p>Aylık sabit gider ₺17,802 ise, ortalama paket fiyatı ₺5,990 olan <strong>en az 3 müşteri</strong> bu gideri karşılar (₺17,970). Vergi dahil gerçek break-even ≈ <strong>4 müşteri</strong>.</p>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="sec-label">Break-Even Görsel Gösterge</div>
+
+<div style="margin-bottom:28px;">
+  <div class="be-label"><span>1 Müşteri — ₺5,990 gelir</span><span class="tag tag-red">Zarar</span></div>
+  <div class="be-bar"><div class="be-fill" style="width:33.6%;background:linear-gradient(90deg,#ef4444,#f87171);">₺5.990</div></div>
+
+  <div class="be-label" style="margin-top:12px;"><span>2 Müşteri — ₺11,980 gelir</span><span class="tag tag-red">Zarar</span></div>
+  <div class="be-bar"><div class="be-fill" style="width:67.3%;background:linear-gradient(90deg,#f97316,#fb923c);">₺11.980</div></div>
+
+  <div class="be-label" style="margin-top:12px;"><span>3 Müşteri — ₺17,970 gelir</span><span class="tag tag-orange">±0 Başabaş</span></div>
+  <div class="be-bar"><div class="be-fill" style="width:100%;background:linear-gradient(90deg,#eab308,#facc15);">₺17.970</div></div>
+
+  <div class="be-label" style="margin-top:12px;"><span>5 Müşteri — ₺29,950 gelir</span><span class="tag tag-green">Kârlı</span></div>
+  <div class="be-bar"><div class="be-fill" style="width:100%;background:linear-gradient(90deg,#22c55e,#4ade80);">₺29.950 → ≈ ₺10K kâr</div></div>
+
+  <div class="be-label" style="margin-top:12px;"><span>10 Müşteri — ₺59,900 gelir</span><span class="tag tag-green">Güçlü Kâr</span></div>
+  <div class="be-bar"><div class="be-fill" style="width:100%;background:linear-gradient(90deg,#2563eb,#3b82f6);">₺59.900 → ≈ ₺35K kâr</div></div>
+</div>
+
+<p class="note">* Çubuklar oransal değil; ₺17,802 eşiği gösterge amaçlı 100% olarak alınmıştır. Gerçek kâr rakamları aşağıdaki senaryo tablosunda detaylıdır.</p>
+
+</div>
+</div>
+
+
+<!-- 5. GELİR SENARYOLARI -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Bölüm 6</div>
+<h2 class="sec-title">Müşteri Sayısına Göre Gelir Projeksiyonu</h2>
+<p class="sec-desc">Ortalama paket fiyatı ₺5,990/ay varsayımıyla 1'den 20 müşteriye kadar aylık net kâr analizi. Reklam Senaryo A (₺4,500/ay) esas alınmıştır.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">💰 Aylık Kâr/Zarar Projeksiyonu (Ortalama Paket: ₺5,990)</div>
+  <table class="cost-table">
+    <tr style="background:#f8fafc;">
+      <td style="font-weight:700;color:#1e293b;">Müşteri Sayısı</td>
+      <td style="font-weight:700;color:#1e293b;">Aylık Gelir</td>
+      <td style="font-weight:700;color:#1e293b;">Sabit Gider (reklam dahil)</td>
+      <td style="font-weight:700;color:#1e293b;">Vergi Tahmini</td>
+      <td style="font-weight:700;color:#1e293b;">Net Kâr</td>
+    </tr>
+    <tr>
+      <td>1 Müşteri</td>
+      <td>₺5,990</td>
+      <td>₺17,802</td>
+      <td>—</td>
+      <td class="red">- ₺11,812</td>
+    </tr>
+    <tr>
+      <td>2 Müşteri</td>
+      <td>₺11,980</td>
+      <td>₺17,802</td>
+      <td>—</td>
+      <td class="red">- ₺5,822</td>
+    </tr>
+    <tr>
+      <td>3 Müşteri</td>
+      <td>₺17,970</td>
+      <td>₺17,802</td>
+      <td>—</td>
+      <td class="orange">≈ ₺168 (başabaş)</td>
+    </tr>
+    <tr>
+      <td>4 Müşteri</td>
+      <td>₺23,960</td>
+      <td>₺17,802</td>
+      <td>≈ ₺924</td>
+      <td class="green">≈ ₺5,234</td>
+    </tr>
+    <tr>
+      <td>5 Müşteri</td>
+      <td>₺29,950</td>
+      <td>₺17,802</td>
+      <td>≈ ₺1,847</td>
+      <td class="green">≈ ₺10,301</td>
+    </tr>
+    <tr>
+      <td>8 Müşteri</td>
+      <td>₺47,920</td>
+      <td>₺18,500</td>
+      <td>≈ ₺4,431</td>
+      <td class="green">≈ ₺24,989</td>
+    </tr>
+    <tr>
+      <td>10 Müşteri</td>
+      <td>₺59,900</td>
+      <td>₺19,200</td>
+      <td>≈ ₺6,175</td>
+      <td class="green">≈ ₺34,525</td>
+    </tr>
+    <tr>
+      <td>15 Müşteri</td>
+      <td>₺89,850</td>
+      <td>₺21,500</td>
+      <td>≈ ₺11,536</td>
+      <td class="green">≈ ₺56,814</td>
+    </tr>
+    <tr class="subtotal">
+      <td>20 Müşteri</td>
+      <td>₺119,800</td>
+      <td>₺24,000</td>
+      <td>≈ ₺17,145</td>
+      <td class="green">≈ ₺78,655 / ay</td>
+    </tr>
+  </table>
+  <p class="note">* Gider kalemleri müşteri artışıyla hafif ölçekte büyür (ek hosting, destek süresi vb.). Gelir vergisi ~%15 ortalama olarak hesaplanmıştır (gerçek dilim farklı olabilir). Setup ücretleri dahil değildir.</p>
+</div>
+
+<div class="scenario-grid">
+  <div class="scenario-card loss">
+    <div class="s-label red">⚠ Başlangıç Fazı</div>
+    <span class="s-count">1–2</span>
+    <div class="s-sub">Müşteri (0–3. ay)</div>
+    <div class="s-rows">
+      <div class="s-row"><span>Aylık gelir</span><span class="neutral">₺5,990–11,980</span></div>
+      <div class="s-row"><span>Sabit gider</span><span class="negative">₺17,802</span></div>
+      <div class="s-row highlight"><span>Net sonuç</span><span class="negative">Zarar</span></div>
+    </div>
+  </div>
+  <div class="scenario-card break">
+    <div class="s-label orange">⚡ Break-Even</div>
+    <span class="s-count">3–4</span>
+    <div class="s-sub">Müşteri (3–6. ay)</div>
+    <div class="s-rows">
+      <div class="s-row"><span>Aylık gelir</span><span class="neutral">₺17,970–23,960</span></div>
+      <div class="s-row"><span>Sabit gider</span><span class="negative">₺17,802</span></div>
+      <div class="s-row highlight"><span>Net sonuç</span><span class="neutral">Başabaş</span></div>
+    </div>
+  </div>
+  <div class="scenario-card profit">
+    <div class="s-label green">✅ Kârlılık</div>
+    <span class="s-count">5–10</span>
+    <div class="s-sub">Müşteri (6–12. ay)</div>
+    <div class="s-rows">
+      <div class="s-row"><span>Aylık gelir</span><span class="positive">₺29,950–59,900</span></div>
+      <div class="s-row"><span>Sabit gider</span><span class="negative">~₺19,000</span></div>
+      <div class="s-row highlight"><span>Net kâr</span><span class="positive">₺10K–35K</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="callout green">
+  <span class="callout-icon">🏆</span>
+  <div>
+    <h4>Setup Ücreti Stratejisi — Erken Dönemi Kurtarır</h4>
+    <p>Her yeni müşteriden alınan <strong>₺9,990 setup ücreti</strong>, ilk 3 aydaki zararı büyük ölçüde telafi eder. 2 müşteri setup ücreti (₺19,980) ≈ 1.5 aylık sabit gideri karşılar. Setup ücreti asla düşürmeyin.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- 6. YIL SONU PROJEKSİYONU -->
+<div class="page">
+<div class="page-inner">
+
+<div class="sec-label">Bölüm 7</div>
+<h2 class="sec-title">12 Aylık Büyüme Senaryosu</h2>
+<p class="sec-desc">Ayda 1 yeni müşteri kazanılması varsayımıyla optimistik büyüme projeksiyonu. Gusto Kartepe 1. ay başlıyor.</p>
+
+<div class="cost-section">
+  <div class="cost-section-header">📅 Aylık Büyüme Takvimi</div>
+  <table class="cost-table">
+    <tr style="background:#f8fafc;">
+      <td style="font-weight:700;">Ay</td>
+      <td style="font-weight:700;">Kümülatif Müşteri</td>
+      <td style="font-weight:700;">Aylık Tekrar Gelir</td>
+      <td style="font-weight:700;">Setup Geliri</td>
+      <td style="font-weight:700;">Aylık Kâr/Zarar</td>
+    </tr>
+    <tr><td>1. Ay</td><td>1 (Gusto Kartepe)</td><td>₺5,990</td><td>₺9,990</td><td class="orange">₺-1,822 (setup ile +₺8,168)</td></tr>
+    <tr><td>2. Ay</td><td>2</td><td>₺11,980</td><td>₺9,990</td><td class="orange">₺-5,822 (setup ile +₺4,168)</td></tr>
+    <tr><td>3. Ay</td><td>3</td><td>₺17,970</td><td>₺9,990</td><td class="green">₺168 (setup ile +₺10,158)</td></tr>
+    <tr><td>4. Ay</td><td>4</td><td>₺23,960</td><td>₺9,990</td><td class="green">₺5,234 (setup ile +₺15,224)</td></tr>
+    <tr><td>5. Ay</td><td>5</td><td>₺29,950</td><td>₺9,990</td><td class="green">₺10,301 (setup ile +₺20,291)</td></tr>
+    <tr><td>6. Ay</td><td>6</td><td>₺35,940</td><td>₺9,990</td><td class="green">₺15,367 (setup ile +₺25,357)</td></tr>
+    <tr><td>9. Ay</td><td>9</td><td>₺53,910</td><td>₺9,990</td><td class="green">₺30,568</td></tr>
+    <tr class="subtotal"><td>12. Ay</td><td>12</td><td>₺71,880</td><td>₺9,990</td><td class="green">≈ ₺44,435 / ay</td></tr>
+  </table>
+</div>
+
+<div class="big-total dark">
+  <div class="bt-row">
+    <span class="bt-label">12. Ay Aylık Tekrar Gelir (MRR)</span>
+    <span class="bt-val green">₺71,880</span>
+  </div>
+  <div class="bt-row">
+    <span class="bt-label">Yıl Boyunca Toplam Setup Geliri (12 müşteri)</span>
+    <span class="bt-val green">₺119,880</span>
+  </div>
+  <div class="bt-row">
+    <span class="bt-label">Yıllık Toplam Brüt Gelir</span>
+    <span class="bt-val yellow">≈ ₺855,240</span>
+  </div>
+  <div class="bt-row">
+    <span class="bt-label">Tahmini Yıllık Net Kâr (vergi sonrası)</span>
+    <span class="bt-val green">≈ ₺280,000–330,000</span>
+  </div>
+</div>
+
+<div class="callout blue">
+  <span class="callout-icon">📌</span>
+  <div>
+    <h4>Önemli Varsayımlar</h4>
+    <p>Tüm hesaplamalar ortalama Profesyonel paket (₺5,990/ay + ₺9,990 setup) üzerinden yapılmıştır. Kurumsal paket alan müşteri veya yıllık ödeme seçenekleri bu rakamları önemli ölçüde artırır. Müşteri churn (iptal) oranı %0 varsayılmıştır — gerçekte ilk yıl için %5–10 hedgeleyin.</p>
+  </div>
+</div>
+
+</div>
+</div>
+
+
+<!-- KAPANIŞ -->
+<div class="closing">
+  <div style="background:rgba(234,179,8,0.18);border:1px solid rgba(234,179,8,0.4);color:#fde68a;
+    font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:5px 16px;
+    border-radius:100px;margin-bottom:28px;">🔒 Gizli Belge</div>
+  <h2>Özet Karar Rehberi</h2>
+  <p style="margin-bottom:36px;">Bu belgeyi okuduktan sonra atmanız gereken adımlar:</p>
+  <div style="text-align:left;max-width:480px;width:100%;">
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 18px;margin-bottom:10px;color:#e2e8f0;font-size:13px;">
+      ✅ Mali müşavir bul — SGK ve vergi optimizasyonu için
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 18px;margin-bottom:10px;color:#e2e8f0;font-size:13px;">
+      ✅ Gusto Kartepe'yi Profesyonel pakete al — setup + aylık sözleşme imzalat
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 18px;margin-bottom:10px;color:#e2e8f0;font-size:13px;">
+      ✅ Meta reklama ₺4,500/ay ile başla — optimize et, sonra artır
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 18px;margin-bottom:10px;color:#e2e8f0;font-size:13px;">
+      ✅ 5 müşteriye ulaşınca LTD. şirket avantajlarını değerlendir
+    </div>
+    <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:14px 18px;color:#e2e8f0;font-size:13px;">
+      ✅ Setup ücreti asla indirim yapma — bu ilk dönem zararını kapatır
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
