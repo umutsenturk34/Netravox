@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -35,6 +36,7 @@ const emptyItem = { label: '', url: '', order: 0 };
 
 export default function MenusPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
   const [selectedMenuId, setSelectedMenuId] = useState(null);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
@@ -44,8 +46,9 @@ export default function MenusPage() {
   const [editingItem, setEditingItem] = useState(null);
 
   const { data: menus = [] } = useQuery({
-    queryKey: ['menus'],
+    queryKey: ['menus', activeTenantId],
     queryFn: () => api.get('/menus').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const selectedMenu = menus.find((m) => m._id === selectedMenuId) || menus[0] || null;

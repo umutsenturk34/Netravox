@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -35,14 +36,16 @@ const emptyForm = { name: '', labelTr: '', labelEn: '', permissions: [] };
 
 export default function RolesPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
   const [form, setForm] = useState(emptyForm);
 
   const { data: roles = [] } = useQuery({
-    queryKey: ['roles'],
+    queryKey: ['roles', activeTenantId],
     queryFn: () => api.get('/roles').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const saveMutation = useMutation({

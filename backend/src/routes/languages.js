@@ -43,9 +43,10 @@ router.patch('/:id', requirePermission('languages.update'), async (req, res) => 
   if (req.body.isDefault) {
     await Language.updateMany({ tenantId: req.tenantId }, { isDefault: false });
   }
+  const { tenantId: _, ...updates } = req.body;
   const lang = await Language.findOneAndUpdate(
     { _id: req.params.id, tenantId: req.tenantId },
-    req.body,
+    updates,
     { new: true }
   );
   if (!lang) return res.status(404).json({ message: 'Dil bulunamadı' });

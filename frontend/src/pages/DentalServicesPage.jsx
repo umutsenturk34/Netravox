@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -23,6 +24,7 @@ const ICONS = ['🦷', '🔬', '💎', '🩺', '✨', '🎯', '🏥', '💉', '�
 
 export default function DentalServicesPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const [modal, setModal] = useState(false);
@@ -31,8 +33,9 @@ export default function DentalServicesPage() {
   const [tab, setTab] = useState('tr');
 
   const { data: services = [], isLoading } = useQuery({
-    queryKey: ['services'],
+    queryKey: ['services', activeTenantId],
     queryFn: () => api.get('/services').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const save = useMutation({

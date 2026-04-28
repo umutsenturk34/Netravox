@@ -5,30 +5,36 @@ const ROLE_PERMISSIONS = {
   agency_admin: [
     'companies.read', 'companies.update',
     'users.read', 'users.create', 'users.update', 'users.delete',
-    'pages.*', 'media.*', 'menus.*', 'seo.*', 'redirects.*',
+    'roles.*', 'pages.*', 'media.*', 'menus.*', 'seo.*', 'redirects.*',
     'restaurant.*', 'reservations.*', 'forms.*',
+    'services.*', 'properties.*',
     'settings.*', 'languages.*',
   ],
   company_admin: [
     'companies.read', 'companies.update',
     'users.read', 'users.create', 'users.update',
-    'pages.*', 'media.*', 'menus.*', 'seo.*', 'redirects.*',
+    'roles.*', 'pages.*', 'media.*', 'menus.*', 'seo.*', 'redirects.*',
     'restaurant.*', 'reservations.*', 'forms.*',
+    'services.*', 'properties.*',
     'settings.read', 'settings.update', 'languages.*',
   ],
   seo_specialist: [
     'pages.read', 'seo.*', 'redirects.*', 'media.read',
+    'services.read', 'properties.read',
   ],
   content_editor: [
     'pages.read', 'pages.create', 'pages.update', 'pages.publish',
     'media.read', 'media.upload', 'menus.read', 'menus.update',
     'restaurant.read', 'restaurant.create', 'restaurant.update',
+    'services.read', 'services.create', 'services.update',
+    'properties.read', 'properties.create', 'properties.update',
   ],
   media_manager: ['media.*'],
   reservation_manager: ['reservations.*', 'forms.*'],
   viewer: [
     'pages.read', 'media.read', 'menus.read',
     'restaurant.read', 'reservations.read', 'forms.read', 'seo.read',
+    'services.read', 'properties.read',
   ],
 };
 

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import { TableSkeleton } from '../components/ui/Skeleton';
@@ -15,11 +16,13 @@ const statusColor = {
 export default function PagesListPage() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['pages'],
+    queryKey: ['pages', activeTenantId],
     queryFn: () => api.get('/pages?limit=50').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const publishMutation = useMutation({

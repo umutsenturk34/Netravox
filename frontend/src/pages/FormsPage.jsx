@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Modal from '../components/ui/Modal';
 import { Select } from '../components/ui/Input';
@@ -17,19 +18,21 @@ const formTypeLabel = { contact: 'İletişim', reservation: 'Rezervasyon', other
 
 export default function FormsPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
   const [filterType, setFilterType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [selected, setSelected] = useState(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['forms', filterType, filterStatus],
+    queryKey: ['forms', activeTenantId, filterType, filterStatus],
     queryFn: () => {
       const params = new URLSearchParams({ limit: 50 });
       if (filterType) params.set('formType', filterType);
       if (filterStatus) params.set('status', filterStatus);
       return api.get(`/forms?${params}`).then((r) => r.data);
     },
+    enabled: !!activeTenantId,
   });
 
   const updateStatus = useMutation({
@@ -169,7 +172,7 @@ export default function FormsPage() {
               {Object.entries(selected.fields || {}).map(([key, val]) => (
                 <div key={key} className="flex gap-3">
                   <span className="text-sm font-medium w-32 shrink-0 capitalize" style={{ color: 'var(--text-secondary)' }}>{key}</span>
-                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{String(val)}</span>
+                  <span className="text-sm" style={{ color: 'var(--text-primary)' }}>{String(val).slice(0, 500)}</span>
                 </div>
               ))}
             </div>

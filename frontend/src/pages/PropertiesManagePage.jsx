@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -32,6 +33,7 @@ const emptyProperty = {
 
 export default function PropertiesManagePage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const [modal, setModal] = useState(false);
@@ -46,8 +48,9 @@ export default function PropertiesManagePage() {
   if (filterStatus) queryParams.set('status', filterStatus);
 
   const { data: properties = [], isLoading } = useQuery({
-    queryKey: ['properties', filterType, filterStatus],
+    queryKey: ['properties', activeTenantId, filterType, filterStatus],
     queryFn: () => api.get(`/properties?${queryParams.toString()}`).then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const save = useMutation({

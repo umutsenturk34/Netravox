@@ -17,9 +17,10 @@ router.post('/', requirePermission('services.create'), async (req, res) => {
 });
 
 router.patch('/:id', requirePermission('services.update'), async (req, res) => {
+  const { tenantId: _, ...updates } = req.body;
   const service = await Service.findOneAndUpdate(
     { _id: req.params.id, tenantId: req.tenantId },
-    req.body,
+    updates,
     { new: true }
   );
   if (!service) return res.status(404).json({ message: 'Hizmet bulunamadı' });

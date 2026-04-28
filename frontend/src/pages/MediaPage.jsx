@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import EmptyState from '../components/ui/EmptyState';
@@ -9,12 +10,14 @@ export default function MediaPage() {
   const qc = useQueryClient();
   const inputRef = useRef();
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const [view, setView] = useState('grid'); // 'grid' | 'list'
   const [copied, setCopied] = useState(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['media'],
+    queryKey: ['media', activeTenantId],
     queryFn: () => api.get('/media?limit=60').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const uploadMutation = useMutation({
@@ -33,8 +36,21 @@ export default function MediaPage() {
     onError: () => toast.error('İşlem başarısız'),
   });
 
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml', 'video/mp4'];
+  const MAX_SIZE = 50 * 1024 * 1024; // 50 MB
+
   const handleFiles = (e) => {
-    Array.from(e.target.files).forEach((f) => uploadMutation.mutate(f));
+    Array.from(e.target.files).forEach((f) => {
+      if (!ALLOWED_TYPES.includes(f.type)) {
+        toast.error(`Desteklenmeyen dosya tipi: ${f.type}`);
+        return;
+      }
+      if (f.size > MAX_SIZE) {
+        toast.error(`Dosya çok büyük: ${Math.round(f.size / 1024 / 1024)} MB (maks 50 MB)`);
+        return;
+      }
+      uploadMutation.mutate(f);
+    });
     e.target.value = '';
   };
 

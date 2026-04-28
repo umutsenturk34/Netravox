@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const formSubmissionSchema = new mongoose.Schema({
   tenantId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  formType: { type: String, enum: ['contact', 'reservation', 'custom'], default: 'contact' },
+  formType: { type: String, enum: ['contact', 'reservation', 'appointment', 'other', 'custom'], default: 'contact' },
   fields: { type: mongoose.Schema.Types.Mixed, required: true },
   status: { type: String, enum: ['new', 'seen', 'replied'], default: 'new' },
   kvkkConsent: { type: Boolean, required: true },

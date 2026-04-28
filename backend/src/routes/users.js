@@ -3,6 +3,7 @@ const User = require('../models/User');
 const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
 const { requirePermission } = require('../middleware/rbac');
+const { validate } = require('../middleware/validate');
 
 router.use(authenticate, resolveTenant);
 
@@ -18,11 +19,8 @@ router.get('/', requirePermission('users.read'), async (req, res) => {
 });
 
 // POST /api/users
-router.post('/', requirePermission('users.create'), async (req, res) => {
+router.post('/', requirePermission('users.create'), validate('createUser'), async (req, res) => {
   const { name, email, password, roleId } = req.body;
-  if (!name || !email || !password || !roleId) {
-    return res.status(400).json({ message: 'name, email, password ve roleId gerekli' });
-  }
 
   const exists = await User.findOne({ email });
   if (exists) return res.status(409).json({ message: 'Bu email zaten kullanımda' });
@@ -45,6 +43,13 @@ router.post('/', requirePermission('users.create'), async (req, res) => {
 
 // PATCH /api/users/:id
 router.patch('/:id', requirePermission('users.update'), async (req, res) => {
+  // Hedef kullanıcı bu firmaya ait olmalı
+  const targetUser = await User.findOne({
+    _id: req.params.id,
+    'companyRoles.tenantId': req.tenantId,
+  });
+  if (!targetUser) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+
   const allowed = ['name', 'isActive'];
   const updates = Object.fromEntries(Object.entries(req.body).filter(([k]) => allowed.includes(k)));
 
@@ -57,7 +62,7 @@ router.patch('/:id', requirePermission('users.update'), async (req, res) => {
   }
 
   const user = await User.findByIdAndUpdate(req.params.id, updates, { new: true })
-    .select('-passwordHash -refreshTokens');
+    .select('-passwordHash -refreshTokens -passwordResetToken -passwordResetExpires');
   if (!user) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
   res.json(user);
 });

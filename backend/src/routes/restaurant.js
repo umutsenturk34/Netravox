@@ -4,6 +4,7 @@ const Item = require('../models/RestaurantMenuItem');
 const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
 const { requirePermission } = require('../middleware/rbac');
+const { safeStr } = require('../utils/query');
 
 router.use(authenticate, resolveTenant);
 
@@ -20,9 +21,10 @@ router.post('/categories', requirePermission('restaurant.create'), async (req, r
 });
 
 router.patch('/categories/:id', requirePermission('restaurant.update'), async (req, res) => {
+  const { tenantId: _, ...updates } = req.body;
   const cat = await Category.findOneAndUpdate(
     { _id: req.params.id, tenantId: req.tenantId },
-    req.body,
+    updates,
     { new: true }
   );
   if (!cat) return res.status(404).json({ message: 'Kategori bulunamadı' });
@@ -40,7 +42,7 @@ router.delete('/categories/:id', requirePermission('restaurant.update'), async (
 /* ---- ÜRÜNLER ---- */
 
 router.get('/items', requirePermission('restaurant.read'), async (req, res) => {
-  const { categoryId } = req.query;
+  const categoryId = safeStr(req.query.categoryId);
   const filter = { tenantId: req.tenantId };
   if (categoryId) filter.categoryId = categoryId;
   const items = await Item.find(filter).sort('order').populate('categoryId', 'name');
@@ -53,9 +55,10 @@ router.post('/items', requirePermission('restaurant.create'), async (req, res) =
 });
 
 router.patch('/items/:id', requirePermission('restaurant.update'), async (req, res) => {
+  const { tenantId: _, ...updates } = req.body;
   const item = await Item.findOneAndUpdate(
     { _id: req.params.id, tenantId: req.tenantId },
-    req.body,
+    updates,
     { new: true }
   );
   if (!item) return res.status(404).json({ message: 'Ürün bulunamadı' });

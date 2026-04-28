@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -12,6 +13,7 @@ const emptyForm = { from: '', to: '', type: 301, isActive: true };
 
 export default function RedirectsPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);
@@ -19,9 +21,33 @@ export default function RedirectsPage() {
   const [form, setForm] = useState(emptyForm);
 
   const { data: redirects = [], isLoading } = useQuery({
-    queryKey: ['redirects'],
+    queryKey: ['redirects', activeTenantId],
     queryFn: () => api.get('/seo/redirects').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
+
+  const isValidUrl = (url) => {
+    if (!url) return false;
+    if (url.startsWith('/')) return true;
+    try {
+      const parsed = new URL(url);
+      return ['http:', 'https:'].includes(parsed.protocol);
+    } catch {
+      return false;
+    }
+  };
+
+  const handleSave = () => {
+    if (!form.from.startsWith('/')) {
+      toast.error('Kaynak URL "/" ile başlamalı');
+      return;
+    }
+    if (!isValidUrl(form.to)) {
+      toast.error('Geçersiz hedef URL');
+      return;
+    }
+    saveMutation.mutate(form);
+  };
 
   const saveMutation = useMutation({
     mutationFn: (data) =>
@@ -153,7 +179,7 @@ export default function RedirectsPage() {
           <div className="flex justify-end gap-3">
             <Button variant="secondary" onClick={closeModal}>İptal</Button>
             <Button
-              onClick={() => saveMutation.mutate(form)}
+              onClick={handleSave}
               disabled={!form.from || !form.to || saveMutation.isPending}
             >
               {saveMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}

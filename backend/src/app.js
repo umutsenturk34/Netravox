@@ -19,7 +19,16 @@ if (missing.length) {
 const app = express();
 
 app.set('trust proxy', 1);
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'none'"],
+      connectSrc: ["'self'"],
+    },
+  },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
+
 const allowedOrigins = (process.env.CLIENT_URL || '')
   .split(',')
   .map((u) => u.trim())
@@ -27,8 +36,11 @@ const allowedOrigins = (process.env.CLIENT_URL || '')
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin || allowedOrigins.includes(origin)) return cb(null, true);
-    cb(new Error(`CORS: ${origin} izin verilmedi`));
+    // Production: origin zorunlu
+    // Development: origin yoksa (curl, Postman) izin ver
+    if (!origin && nodeEnv !== 'production') return cb(null, true);
+    if (origin && allowedOrigins.includes(origin)) return cb(null, true);
+    cb(new Error(`CORS: ${origin || 'no-origin'} izin verilmedi`));
   },
   credentials: true,
 }));

@@ -4,4 +4,18 @@ dist/
 .env.local
 .env.production
 uploads/
+
+# PDF ve sunum dosyaları
 *.pdf
+*.html
+
+# Planlama / dokümantasyon — sadece geliştirici makinede kalır
+*.md
+
+# Müşteri web siteleri — ayrı repo'lara taşınacak
+dental-site/
+gusto-kartepe/
+realty-site/
+
+# Claude hafıza
+.claude/

@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { Skeleton } from '../components/ui/Skeleton';
 
@@ -18,16 +19,19 @@ const formTypeLabel = { contact: 'İletişim', reservation: 'Rezervasyon', other
 
 export default function NotificationsPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const { data: resData, isLoading: resLoading } = useQuery({
-    queryKey: ['reservations', 'all'],
+    queryKey: ['reservations', activeTenantId, 'all'],
     queryFn: () => api.get('/reservations?limit=20').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const { data: formsData, isLoading: formsLoading } = useQuery({
-    queryKey: ['forms', 'all'],
+    queryKey: ['forms', activeTenantId, 'all'],
     queryFn: () => api.get('/forms?limit=20').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const updateRes = useMutation({

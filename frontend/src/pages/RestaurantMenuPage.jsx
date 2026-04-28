@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -22,6 +23,7 @@ const ALLERGENS = ['gluten', 'dairy', 'eggs', 'nuts', 'peanuts', 'soy', 'fish', 
 
 export default function RestaurantMenuPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const [selectedCatId, setSelectedCatId] = useState(null);
@@ -35,13 +37,15 @@ export default function RestaurantMenuPage() {
   const [itemTab, setItemTab] = useState('tr');
 
   const { data: cats = [] } = useQuery({
-    queryKey: ['restaurant', 'categories'],
+    queryKey: ['restaurant', activeTenantId, 'categories'],
     queryFn: () => api.get('/restaurant/categories').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const { data: items = [] } = useQuery({
-    queryKey: ['restaurant', 'items'],
+    queryKey: ['restaurant', activeTenantId, 'items'],
     queryFn: () => api.get('/restaurant/items').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const selectedCat = cats.find((c) => c._id === selectedCatId) || cats[0] || null;
@@ -56,7 +60,7 @@ export default function RestaurantMenuPage() {
         ? api.patch(`/restaurant/categories/${editingCat._id}`, data).then((r) => r.data)
         : api.post('/restaurant/categories', data).then((r) => r.data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['restaurant', 'categories'] });
+      qc.invalidateQueries({ queryKey: ['restaurant', activeTenantId, 'categories'] });
       toast.success(editingCat ? 'Kategori güncellendi' : 'Kategori oluşturuldu');
       setCatModal(false);
       setCatForm(emptyCat);
@@ -68,7 +72,7 @@ export default function RestaurantMenuPage() {
   const deleteCat = useMutation({
     mutationFn: (id) => api.delete(`/restaurant/categories/${id}`),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['restaurant', 'categories'] });
+      qc.invalidateQueries({ queryKey: ['restaurant', activeTenantId, 'categories'] });
       setSelectedCatId(null);
       toast.success('Kategori silindi');
     },
@@ -82,7 +86,7 @@ export default function RestaurantMenuPage() {
         ? api.patch(`/restaurant/items/${editingItem._id}`, data).then((r) => r.data)
         : api.post('/restaurant/items', data).then((r) => r.data),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['restaurant', 'items'] });
+      qc.invalidateQueries({ queryKey: ['restaurant', activeTenantId, 'items'] });
       toast.success(editingItem ? 'Ürün güncellendi' : 'Ürün eklendi');
       setItemModal(false);
       setItemForm(emptyItem);
@@ -94,7 +98,7 @@ export default function RestaurantMenuPage() {
   const deleteItem = useMutation({
     mutationFn: (id) => api.delete(`/restaurant/items/${id}`),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['restaurant', 'items'] });
+      qc.invalidateQueries({ queryKey: ['restaurant', activeTenantId, 'items'] });
       toast.success('Ürün silindi');
     },
     onError: () => toast.error('Silinemedi'),
@@ -102,7 +106,7 @@ export default function RestaurantMenuPage() {
 
   const toggleItemActive = useMutation({
     mutationFn: ({ id, isActive }) => api.patch(`/restaurant/items/${id}`, { isActive }).then((r) => r.data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['restaurant', 'items'] }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['restaurant', activeTenantId, 'items'] }),
   });
 
   const openNewCat = () => { setEditingCat(null); setCatForm(emptyCat); setCatModal(true); };

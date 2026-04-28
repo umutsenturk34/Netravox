@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
   }],
   refreshTokens: [String],
   lastLoginAt: { type: Date, default: null },
+  passwordResetToken: { type: String, default: null },
+  passwordResetExpires: { type: Date, default: null },
 }, { timestamps: true });
 
 userSchema.methods.comparePassword = async function (plain) {
