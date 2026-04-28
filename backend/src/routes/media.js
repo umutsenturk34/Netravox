@@ -8,10 +8,25 @@ const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
 const { requirePermission } = require('../middleware/rbac');
 const { storage: storageCfg } = require('../config/env');
+const { safePage, safePageNum } = require('../utils/query');
+
+const MAGIC = {
+  'image/jpeg': [0xFF, 0xD8, 0xFF],
+  'image/png': [0x89, 0x50, 0x4E, 0x47],
+  'image/gif': [0x47, 0x49, 0x46],
+  'image/webp': null, // sharp ile işlenecek, MIME kontrolü yeterli
+  'video/mp4': null,  // MP4 magic number karmaşık, boyut limiti yeterli
+};
+
+const checkMagicNumber = (buffer, mimeType) => {
+  const magic = MAGIC[mimeType];
+  if (!magic) return true;
+  return magic.every((byte, i) => buffer[i] === byte);
+};
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20 MB
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB (20'den düşürüldü)
   fileFilter: (_, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4'];
     cb(null, allowed.includes(file.mimetype));
@@ -22,19 +37,25 @@ router.use(authenticate, resolveTenant);
 
 // GET /api/media
 router.get('/', requirePermission('media.read'), async (req, res) => {
-  const { page = 1, limit = 30, archived = 'false' } = req.query;
-  const filter = { tenantId: req.tenantId, isArchived: archived === 'true' };
+  const page = safePageNum(req.query.page);
+  const limit = safePage(req.query.limit, 30);
+  const archived = req.query.archived === 'true';
+  const filter = { tenantId: req.tenantId, isArchived: archived };
 
   const [items, total] = await Promise.all([
-    Media.find(filter).sort('-createdAt').skip((page - 1) * limit).limit(Number(limit)),
+    Media.find(filter).sort('-createdAt').skip((page - 1) * limit).limit(limit),
     Media.countDocuments(filter),
   ]);
-  res.json({ data: items, total, page: Number(page), limit: Number(limit) });
+  res.json({ data: items, total, page, limit });
 });
 
 // POST /api/media/upload
 router.post('/upload', requirePermission('media.upload'), upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ message: 'Dosya gerekli' });
+
+  if (!checkMagicNumber(req.file.buffer, req.file.mimetype)) {
+    return res.status(400).json({ message: 'Geçersiz dosya formatı' });
+  }
 
   const id = uuidv4();
   const isImage = req.file.mimetype.startsWith('image/');

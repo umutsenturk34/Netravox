@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 const STATUS = {
   new: { label: 'Yeni', cls: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' },
@@ -11,9 +12,11 @@ const STATUS = {
 
 export default function ReservationsPage() {
   const qc = useQueryClient();
+  const { activeTenantId } = useAuth();
   const { data, isLoading } = useQuery({
-    queryKey: ['reservations'],
+    queryKey: ['reservations', activeTenantId],
     queryFn: () => api.get('/reservations?limit=50').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const updateStatus = useMutation({

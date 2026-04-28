@@ -10,12 +10,4 @@ const signRefresh = (userId) =>
 const verifyRefresh = (token) =>
   jwt.verify(token, cfg.refreshSecret);
 
-// Reset token — kullanıcının mevcut passwordHash'inin ilk 10 karakteri dahil edilir.
-// Bu sayede şifre değiştikten sonra token geçersiz kalır (tek kullanımlık).
-const signReset = (userId, pwFingerprint) =>
-  jwt.sign({ userId, pwf: pwFingerprint }, cfg.secret, { expiresIn: '1h' });
-
-const verifyReset = (token) =>
-  jwt.verify(token, cfg.secret);
-
-module.exports = { signAccess, signRefresh, verifyRefresh, signReset, verifyReset };
+module.exports = { signAccess, signRefresh, verifyRefresh };

@@ -18,29 +18,48 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// Singleton refresh promise — paralel 401'lerin çoklu refresh tetiklemesini önler
+let refreshPromise = null;
+
+function forceLogout() {
+  localStorage.clear();
+  window.location.href = '/login';
+}
+
 // Response: 401 → token yenile
 api.interceptors.response.use(
   (res) => res,
-  async (error) => {
+  (error) => {
     const original = error.config;
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
-        localStorage.clear();
-        window.location.href = '/login';
+        forceLogout();
         return Promise.reject(error);
       }
-      try {
-        const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
-        localStorage.setItem('accessToken', data.accessToken);
-        localStorage.setItem('refreshToken', data.refreshToken);
-        original.headers.Authorization = `Bearer ${data.accessToken}`;
-        return api(original);
-      } catch {
-        localStorage.clear();
-        window.location.href = '/login';
+
+      if (!refreshPromise) {
+        refreshPromise = axios
+          .post(`${BASE_URL}/auth/refresh`, { refreshToken })
+          .then(({ data }) => {
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('refreshToken', data.refreshToken);
+            return data.accessToken;
+          })
+          .catch((err) => {
+            forceLogout();
+            return Promise.reject(err);
+          })
+          .finally(() => {
+            refreshPromise = null;
+          });
       }
+
+      return refreshPromise.then((accessToken) => {
+        original.headers.Authorization = `Bearer ${accessToken}`;
+        return api(original);
+      });
     }
     return Promise.reject(error);
   }

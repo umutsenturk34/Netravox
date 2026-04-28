@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 
@@ -7,11 +8,13 @@ const LANG_NAMES = { tr: 'Türkçe', en: 'İngilizce', de: 'Almanca', fr: 'Frans
 
 export default function LanguagesPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const { data: langs = [], isLoading } = useQuery({
-    queryKey: ['languages'],
+    queryKey: ['languages', activeTenantId],
     queryFn: () => api.get('/languages').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const addMutation = useMutation({

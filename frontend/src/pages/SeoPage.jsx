@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect } from 'react';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import { Input, Textarea } from '../components/ui/Input';
@@ -14,6 +15,7 @@ const TABS = [
 export default function SeoPage() {
   const qc = useQueryClient();
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const [activeTab, setActiveTab] = useState('general');
   const [form, setForm] = useState({
     siteName: { tr: '', en: '' },
@@ -28,8 +30,9 @@ export default function SeoPage() {
   });
 
   const { data } = useQuery({
-    queryKey: ['seo', 'settings'],
+    queryKey: ['seo', activeTenantId, 'settings'],
     queryFn: () => api.get('/seo/settings').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   useEffect(() => {

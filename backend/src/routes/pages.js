@@ -3,13 +3,17 @@ const Page = require('../models/Page');
 const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
 const { requirePermission } = require('../middleware/rbac');
+const { safeStr, safePage, safePageNum } = require('../utils/query');
 
 // Tüm route'lar authenticate + resolveTenant gerektirir
 router.use(authenticate, resolveTenant);
 
 // GET /api/pages
 router.get('/', requirePermission('pages.read'), async (req, res) => {
-  const { status, template, page = 1, limit = 20 } = req.query;
+  const status = safeStr(req.query.status);
+  const template = safeStr(req.query.template);
+  const page = safePageNum(req.query.page);
+  const limit = safePage(req.query.limit);
   const filter = { tenantId: req.tenantId };
   if (status) filter.status = status;
   if (template) filter.template = template;
@@ -18,12 +22,12 @@ router.get('/', requirePermission('pages.read'), async (req, res) => {
     Page.find(filter)
       .sort('-updatedAt')
       .skip((page - 1) * limit)
-      .limit(Number(limit))
+      .limit(limit)
       .select('title slug status template featuredImage publishedAt updatedAt'),
     Page.countDocuments(filter),
   ]);
 
-  res.json({ data: pages, total, page: Number(page), limit: Number(limit) });
+  res.json({ data: pages, total, page, limit });
 });
 
 // POST /api/pages

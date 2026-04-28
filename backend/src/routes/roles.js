@@ -2,11 +2,12 @@ const router = require('express').Router();
 const Role = require('../models/Role');
 const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
+const { requirePermission } = require('../middleware/rbac');
 
 router.use(authenticate, resolveTenant);
 
 // GET /api/roles — sistem rolleri + firmaya özel roller
-router.get('/', async (req, res) => {
+router.get('/', requirePermission('roles.read'), async (req, res) => {
   const roles = await Role.find({
     $or: [{ tenantId: null }, { tenantId: req.tenantId }],
   }).select('name label permissions isSystem tenantId').sort('isSystem name');
@@ -14,7 +15,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /api/roles — özel rol oluştur
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('roles.create'), async (req, res) => {
   const { name, label, permissions } = req.body;
   if (!name) return res.status(400).json({ message: 'name gerekli' });
 
@@ -32,7 +33,7 @@ router.post('/', async (req, res) => {
 });
 
 // PATCH /api/roles/:id — özel rol güncelle (sistem rolleri güncellenemez)
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requirePermission('roles.update'), async (req, res) => {
   const role = await Role.findOne({ _id: req.params.id, tenantId: req.tenantId, isSystem: false });
   if (!role) return res.status(404).json({ message: 'Rol bulunamadı veya sistem rolü değiştirilemez' });
 
@@ -43,7 +44,7 @@ router.patch('/:id', async (req, res) => {
 });
 
 // DELETE /api/roles/:id — özel rol sil
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requirePermission('roles.delete'), async (req, res) => {
   const role = await Role.findOne({ _id: req.params.id, tenantId: req.tenantId, isSystem: false });
   if (!role) return res.status(404).json({ message: 'Rol bulunamadı veya sistem rolü silinemez' });
   await role.deleteOne();

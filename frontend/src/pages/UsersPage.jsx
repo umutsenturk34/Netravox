@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 import Modal from '../components/ui/Modal';
@@ -13,6 +14,7 @@ const EXCLUDED_ROLES = ['super_admin', 'agency_admin'];
 
 export default function UsersPage() {
   const { toast } = useToast();
+  const { activeTenantId } = useAuth();
   const qc = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);
@@ -20,13 +22,15 @@ export default function UsersPage() {
   const [form, setForm] = useState(emptyForm);
 
   const { data: users = [], isLoading } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['users', activeTenantId],
     queryFn: () => api.get('/users').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const { data: roles = [] } = useQuery({
-    queryKey: ['roles'],
+    queryKey: ['roles', activeTenantId],
     queryFn: () => api.get('/roles').then((r) => r.data),
+    enabled: !!activeTenantId,
   });
 
   const assignableRoles = roles.filter((r) => !EXCLUDED_ROLES.includes(r.name));

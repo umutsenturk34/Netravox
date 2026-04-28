@@ -6,20 +6,23 @@ const { resolveTenant } = require('../middleware/tenant');
 const { requirePermission } = require('../middleware/rbac');
 const { sendMail } = require('../services/mailer');
 const { confirmedTemplate, rejectedTemplate } = require('../services/emailTemplates');
+const { safeStr, safePage, safePageNum } = require('../utils/query');
 
 router.use(authenticate, resolveTenant);
 
 // GET /api/reservations
 router.get('/', requirePermission('reservations.read'), async (req, res) => {
-  const { status, page = 1, limit = 20 } = req.query;
+  const status = safeStr(req.query.status);
+  const page = safePageNum(req.query.page);
+  const limit = safePage(req.query.limit);
   const filter = { tenantId: req.tenantId };
   if (status) filter.status = status;
 
   const [items, total] = await Promise.all([
-    Reservation.find(filter).sort('-createdAt').skip((page - 1) * limit).limit(Number(limit)),
+    Reservation.find(filter).sort('-createdAt').skip((page - 1) * limit).limit(limit),
     Reservation.countDocuments(filter),
   ]);
-  res.json({ data: items, total, page: Number(page), limit: Number(limit) });
+  res.json({ data: items, total, page, limit });
 });
 
 // PATCH /api/reservations/:id/status

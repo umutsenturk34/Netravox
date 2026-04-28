@@ -9,6 +9,11 @@ export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const token = searchParams.get('token');
 
+  // Token'ı URL'den temizle — tarayıcı geçmişine / referer başlığına sızmasın
+  if (token && typeof window !== 'undefined') {
+    window.history.replaceState({}, '', '/reset-password');
+  }
+
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,6 +35,8 @@ export default function ResetPasswordPage() {
     e.preventDefault();
     setError('');
     if (password.length < 8) return setError('Şifre en az 8 karakter olmalı');
+    if (!/[A-Z]/.test(password)) return setError('Şifre en az bir büyük harf içermeli');
+    if (!/[0-9]/.test(password)) return setError('Şifre en az bir rakam içermeli');
     if (password !== confirm) return setError('Şifreler eşleşmiyor');
 
     setLoading(true);
@@ -58,7 +65,7 @@ export default function ResetPasswordPage() {
             Yeni Şifre Belirle
           </h1>
           <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
-            En az 8 karakter, güçlü bir şifre seçin.
+            En az 8 karakter, büyük harf ve rakam içermeli.
           </p>
         </div>
 

@@ -1,16 +1,15 @@
+const crypto = require('crypto');
 const router = require('express').Router();
 const User = require('../models/User');
-const { signAccess, signRefresh, verifyRefresh, signReset, verifyReset } = require('../utils/jwt');
+const { signAccess, signRefresh, verifyRefresh } = require('../utils/jwt');
 const { authenticate } = require('../middleware/auth');
-const { loginLimiter } = require('../middleware/rateLimit');
+const { loginLimiter, publicFormLimiter } = require('../middleware/rateLimit');
+const { validate, strongPassword } = require('../middleware/validate');
 const { sendPasswordReset } = require('../services/email');
 
 // POST /api/auth/login
-router.post('/login', loginLimiter, async (req, res) => {
+router.post('/login', loginLimiter, validate('login'), async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email ve şifre gerekli' });
-  }
 
   const user = await User.findOne({ email, isActive: true }).populate('companyRoles.roleId');
   if (!user || !(await user.comparePassword(password))) {
@@ -39,7 +38,7 @@ router.post('/login', loginLimiter, async (req, res) => {
 });
 
 // POST /api/auth/refresh
-router.post('/refresh', async (req, res) => {
+router.post('/refresh', publicFormLimiter, async (req, res) => {
   const { refreshToken } = req.body;
   if (!refreshToken) return res.status(400).json({ message: 'Refresh token gerekli' });
 
@@ -58,6 +57,7 @@ router.post('/refresh', async (req, res) => {
   const newAccess = signAccess(user._id);
   const newRefresh = signRefresh(user._id);
 
+  // Token rotasyonu — eski token çıkar, yeni token ekle
   user.refreshTokens = user.refreshTokens.filter((t) => t !== refreshToken);
   user.refreshTokens.push(newRefresh);
   await user.save();
@@ -80,20 +80,29 @@ router.get('/me', authenticate, (req, res) => {
   res.json(req.user);
 });
 
-// PATCH /api/auth/profile — kendi adını veya şifresini güncelle
+// PATCH /api/auth/profile
 router.patch('/profile', authenticate, async (req, res) => {
   const { name, currentPassword, newPassword } = req.body;
   const user = await User.findById(req.user._id);
 
-  if (name) user.name = name;
+  if (name) {
+    if (typeof name !== 'string' || name.length < 2) {
+      return res.status(400).json({ message: 'Ad en az 2 karakter olmalı' });
+    }
+    user.name = name.trim();
+  }
 
   if (newPassword) {
     if (!currentPassword) return res.status(400).json({ message: 'Mevcut şifre gerekli' });
     const ok = await user.comparePassword(currentPassword);
     if (!ok) return res.status(400).json({ message: 'Mevcut şifre hatalı' });
-    if (newPassword.length < 8) return res.status(400).json({ message: 'Yeni şifre en az 8 karakter olmalı' });
+
+    const parsed = strongPassword.safeParse(newPassword);
+    if (!parsed.success) {
+      return res.status(400).json({ message: parsed.error.errors[0]?.message });
+    }
     user.passwordHash = await User.hashPassword(newPassword);
-    user.refreshTokens = []; // diğer oturumları sonlandır
+    user.refreshTokens = [];
   }
 
   await user.save();
@@ -101,17 +110,18 @@ router.patch('/profile', authenticate, async (req, res) => {
 });
 
 // POST /api/auth/forgot-password
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', publicFormLimiter, async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: 'Email gerekli' });
 
-  // Kullanıcı bulunamasa bile aynı mesajı dön (güvenlik: email enumeration önleme)
   const user = await User.findOne({ email, isActive: true });
   if (user) {
-    const pwFingerprint = user.passwordHash.slice(0, 10);
-    const token = signReset(user._id, pwFingerprint);
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
+    const rawToken = crypto.randomBytes(32).toString('hex');
+    user.passwordResetToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    user.passwordResetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 saat
+    await user.save();
 
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${rawToken}`;
     try {
       await sendPasswordReset({ to: user.email, name: user.name, resetUrl });
     } catch (err) {
@@ -119,32 +129,27 @@ router.post('/forgot-password', async (req, res) => {
     }
   }
 
+  // Kullanıcı bulunamasa bile aynı mesaj (email enumeration önleme)
   res.json({ message: 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.' });
 });
 
 // POST /api/auth/reset-password
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', validate('resetPassword'), async (req, res) => {
   const { token, password } = req.body;
-  if (!token || !password) return res.status(400).json({ message: 'Token ve şifre gerekli' });
-  if (password.length < 8) return res.status(400).json({ message: 'Şifre en az 8 karakter olmalı' });
 
-  let decoded;
-  try {
-    decoded = verifyReset(token);
-  } catch {
-    return res.status(400).json({ message: 'Geçersiz veya süresi dolmuş bağlantı' });
-  }
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() },
+    isActive: true,
+  });
 
-  const user = await User.findById(decoded.userId);
-  if (!user || !user.isActive) return res.status(400).json({ message: 'Geçersiz bağlantı' });
-
-  // Token'daki parmak izi mevcut hash ile eşleşmeli (tek kullanımlık garantisi)
-  if (user.passwordHash.slice(0, 10) !== decoded.pwf) {
-    return res.status(400).json({ message: 'Bu bağlantı zaten kullanılmış' });
-  }
+  if (!user) return res.status(400).json({ message: 'Geçersiz veya süresi dolmuş bağlantı' });
 
   user.passwordHash = await User.hashPassword(password);
-  user.refreshTokens = []; // Tüm aktif oturumları sonlandır
+  user.passwordResetToken = null;
+  user.passwordResetExpires = null;
+  user.refreshTokens = [];
   await user.save();
 
   res.json({ message: 'Şifre başarıyla güncellendi. Yeni şifrenizle giriş yapabilirsiniz.' });
