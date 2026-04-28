@@ -9,6 +9,12 @@ uploads/
 *.pdf
 *.html
 
+# Google Cloud servis hesabı anahtarları — asla git'e girmesin
+*.json
+!frontend/package.json
+!frontend/vercel.json
+!backend/package*.json
+
 # Planlama / dokümantasyon — sadece geliştirici makinede kalır
 *.md
 

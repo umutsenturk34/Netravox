@@ -7,22 +7,22 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-  { label: 'Dashboard',             to: '/dashboard',              icon: LayoutDashboard },
-  { label: 'Sayfalar',              to: '/pages',                  icon: FileText },
-  { label: 'Medya',                 to: '/media',                  icon: Image },
-  { label: 'Navigasyon',            to: '/menus',                  icon: Menu },
-  { label: 'Restoran Menüsü',       to: '/restaurant/menu',        icon: UtensilsCrossed },
+  { label: 'Dashboard',              to: '/dashboard',              icon: LayoutDashboard },
+  { label: 'Sayfalar',               to: '/pages',                  icon: FileText },
+  { label: 'Medya',                  to: '/media',                  icon: Image },
+  { label: 'Navigasyon',             to: '/menus',                  icon: Menu },
+  { label: 'Restoran Menüsü',        to: '/restaurant/menu',        icon: UtensilsCrossed },
   { label: 'Diş Hekimi Hizmetleri', to: '/dental/services',        icon: HeartPulse },
-  { label: 'Emlak İlanları',        to: '/real-estate/properties', icon: Building2 },
-  { label: 'Rezervasyonlar',        to: '/reservations',           icon: Calendar },
-  { label: 'Form Gönderileri',      to: '/forms',                  icon: Mail },
-  { label: 'Bildirimler',           to: '/notifications',          icon: Bell },
-  { label: 'SEO',                   to: '/seo',                    icon: Search },
-  { label: 'Redirect',              to: '/redirects',              icon: ArrowRightLeft },
-  { label: 'Diller',                to: '/languages',              icon: Globe },
-  { label: 'Kullanıcılar',          to: '/users',                  icon: Users },
-  { label: 'Roller',                to: '/roles',                  icon: ShieldCheck },
-  { label: 'Firma Ayarları',        to: '/settings',               icon: Settings },
+  { label: 'Emlak İlanları',         to: '/real-estate/properties', icon: Building2 },
+  { label: 'Rezervasyonlar',         to: '/reservations',           icon: Calendar },
+  { label: 'Form Gönderileri',       to: '/forms',                  icon: Mail },
+  { label: 'Bildirimler',            to: '/notifications',          icon: Bell },
+  { label: 'SEO',                    to: '/seo',                    icon: Search },
+  { label: 'Redirect',               to: '/redirects',              icon: ArrowRightLeft },
+  { label: 'Diller',                 to: '/languages',              icon: Globe },
+  { label: 'Kullanıcılar',           to: '/users',                  icon: Users },
+  { label: 'Roller',                 to: '/roles',                  icon: ShieldCheck },
+  { label: 'Firma Ayarları',         to: '/settings',               icon: Settings },
 ];
 
 const adminItems = [
@@ -34,67 +34,99 @@ export default function Sidebar() {
 
   return (
     <aside
-      className="w-56 shrink-0 border-r flex flex-col"
-      style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
+      className="w-58 shrink-0 border-r flex flex-col"
+      style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)', width: '232px' }}
     >
-      {/* Logo */}
+      {/* Marka alanı */}
       <div
-        className="h-14 flex items-center px-5 border-b"
+        className="h-14 flex items-center px-5 border-b gap-2.5"
         style={{ borderColor: 'var(--border)' }}
       >
-        <span className="text-base font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
-          Netravox
-        </span>
-        <span className="ml-1 text-xs px-1.5 py-0.5 rounded font-medium bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400">
-          CMS
-        </span>
+        <div className="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center shrink-0">
+          <span className="text-white text-xs font-bold">N</span>
+        </div>
+        <div className="flex items-baseline gap-1.5">
+          <span className="text-sm font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
+            Netravox
+          </span>
+          <span className="text-[10px] px-1.5 py-0.5 rounded-md font-semibold bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400 leading-none">
+            CMS
+          </span>
+        </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-0.5">
+      <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5">
         {navItems.map(({ label, to, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
             end={to === '/pages'}
             className={({ isActive }) =>
-              `flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors ${
+              `group flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
                 isActive
-                  ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-medium'
+                  ? 'bg-indigo-50 dark:bg-indigo-950/50 font-medium'
                   : 'hover:bg-[var(--bg-muted)]'
               }`
             }
-            style={{ color: 'var(--text-secondary)' }}
           >
-            <Icon size={15} className="shrink-0" />
-            {label}
+            {({ isActive }) => (
+              <>
+                <Icon
+                  size={15}
+                  className="shrink-0 transition-colors"
+                  style={{ color: isActive ? '#6366f1' : 'var(--text-muted)' }}
+                />
+                <span style={{ color: isActive ? '#6366f1' : 'var(--text-secondary)' }}>
+                  {label}
+                </span>
+              </>
+            )}
           </NavLink>
         ))}
 
         {user?.isSuperAdmin && (
           <>
-            <div className="pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>
-              Sistem
+            <div className="pt-5 pb-1.5 px-3">
+              <span className="text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+                Sistem
+              </span>
             </div>
             {adminItems.map(({ label, to, icon: Icon }) => (
               <NavLink
                 key={to}
                 to={to}
                 className={({ isActive }) =>
-                  `flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors ${
+                  `group flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-all duration-150 ${
                     isActive
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-400 font-medium'
+                      ? 'bg-indigo-50 dark:bg-indigo-950/50 font-medium'
                       : 'hover:bg-[var(--bg-muted)]'
                   }`
                 }
-                style={{ color: 'var(--text-secondary)' }}
               >
-                <Icon size={15} className="shrink-0" />
-                {label}
+                {({ isActive }) => (
+                  <>
+                    <Icon
+                      size={15}
+                      className="shrink-0"
+                      style={{ color: isActive ? '#6366f1' : 'var(--text-muted)' }}
+                    />
+                    <span style={{ color: isActive ? '#6366f1' : 'var(--text-secondary)' }}>
+                      {label}
+                    </span>
+                  </>
+                )}
               </NavLink>
             ))}
           </>
         )}
       </nav>
+
+      {/* Alt bilgi */}
+      <div className="px-4 py-3 border-t" style={{ borderColor: 'var(--border)' }}>
+        <p className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>
+          v1.0 · Netravox CMS
+        </p>
+      </div>
     </aside>
   );
 }

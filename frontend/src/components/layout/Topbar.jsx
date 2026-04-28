@@ -23,6 +23,14 @@ export default function Topbar() {
     enabled: !!user,
   });
 
+  // Aktif firmanın detaylarını çek (logo, marka rengi)
+  const { data: activeCompany } = useQuery({
+    queryKey: ['company', activeTenantId],
+    queryFn: () => api.get(`/companies/${activeTenantId}`).then((r) => r.data),
+    enabled: !!activeTenantId,
+    staleTime: 5 * 60 * 1000,
+  });
+
   useEffect(() => {
     if (companies?.length && !activeTenantId) {
       switchTenant(companies[0]._id);
@@ -31,7 +39,6 @@ export default function Topbar() {
 
   const handleTenantChange = (tenantId) => {
     switchTenant(tenantId);
-    // Tüm tenant-bağımlı cache'i temizle, yeni tenant verisi çekilsin
     qc.invalidateQueries();
     navigate('/dashboard');
   };
@@ -41,18 +48,27 @@ export default function Topbar() {
     navigate('/login');
   };
 
+  const logoUrl = theme === 'dark'
+    ? activeCompany?.branding?.logoDark || activeCompany?.branding?.logoLight
+    : activeCompany?.branding?.logoLight || activeCompany?.branding?.logoDark;
+
+  const companyName = companies?.find((c) => c._id === activeTenantId)?.name || activeCompany?.name || '';
+
   return (
     <header
       className="h-14 shrink-0 border-b flex items-center justify-between px-5"
       style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
     >
-      {/* Firma seçici */}
+      {/* Firma logosu / seçici */}
       {companies?.length > 1 ? (
         <div className="relative flex items-center gap-1">
+          {logoUrl && (
+            <img src={logoUrl} alt={companyName} className="h-6 w-auto object-contain mr-1" />
+          )}
           <select
             value={activeTenantId || ''}
             onChange={(e) => handleTenantChange(e.target.value)}
-            className="appearance-none text-sm font-medium rounded-lg pl-3 pr-8 py-1.5 border outline-none focus:ring-2 focus:ring-blue-500/30 transition-shadow"
+            className="appearance-none text-sm font-semibold rounded-lg pl-3 pr-8 py-1.5 border outline-none focus:ring-2 focus:ring-indigo-500/30 transition-shadow"
             style={{
               background: 'var(--bg-muted)',
               borderColor: 'var(--border)',
@@ -67,9 +83,15 @@ export default function Topbar() {
           <ChevronDown size={14} className="absolute right-2 pointer-events-none" style={{ color: 'var(--text-muted)' }} />
         </div>
       ) : (
-        <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-          {companies?.[0]?.name || ''}
-        </span>
+        <div className="flex items-center gap-2.5">
+          {logoUrl ? (
+            <img src={logoUrl} alt={companyName} className="h-7 w-auto max-w-[120px] object-contain" />
+          ) : (
+            <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {companyName}
+            </span>
+          )}
+        </div>
       )}
 
       <div className="flex items-center gap-1">
@@ -89,7 +111,7 @@ export default function Topbar() {
             to="/profile"
             className="flex items-center gap-2 px-2 py-1 rounded-lg hover:bg-[var(--bg-muted)] transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-semibold">
+            <div className="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center text-white text-xs font-semibold">
               {user?.name?.[0]?.toUpperCase()}
             </div>
             <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
