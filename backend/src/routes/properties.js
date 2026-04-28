@@ -2,10 +2,11 @@ const router = require('express').Router();
 const Property = require('../models/Property');
 const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
+const { requirePermission } = require('../middleware/rbac');
 
 router.use(authenticate, resolveTenant);
 
-router.get('/', async (req, res) => {
+router.get('/', requirePermission('properties.read'), async (req, res) => {
   const { type, propertyType, status } = req.query;
   const filter = { tenantId: req.tenantId };
   if (type) filter.type = type;
@@ -15,12 +16,12 @@ router.get('/', async (req, res) => {
   res.json(properties);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('properties.create'), async (req, res) => {
   const property = await Property.create({ ...req.body, tenantId: req.tenantId });
   res.status(201).json(property);
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requirePermission('properties.update'), async (req, res) => {
   const property = await Property.findOneAndUpdate(
     { _id: req.params.id, tenantId: req.tenantId },
     req.body,
@@ -30,8 +31,9 @@ router.patch('/:id', async (req, res) => {
   res.json(property);
 });
 
-router.delete('/:id', async (req, res) => {
-  await Property.findOneAndDelete({ _id: req.params.id, tenantId: req.tenantId });
+router.delete('/:id', requirePermission('properties.delete'), async (req, res) => {
+  const property = await Property.findOneAndDelete({ _id: req.params.id, tenantId: req.tenantId });
+  if (!property) return res.status(404).json({ message: 'İlan bulunamadı' });
   res.json({ message: 'İlan silindi' });
 });
 

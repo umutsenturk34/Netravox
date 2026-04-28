@@ -7,6 +7,7 @@ const Reservation = require('../models/Reservation');
 const FormSubmission = require('../models/FormSubmission');
 const Service = require('../models/Service');
 const Property = require('../models/Property');
+const { publicFormLimiter } = require('../middleware/rateLimit');
 
 const findCompany = async (slug) => Company.findOne({ slug, isActive: true });
 
@@ -87,7 +88,7 @@ router.get('/:slug/properties', async (req, res) => {
 });
 
 // POST /api/public/:slug/reservation  (restoran)
-router.post('/:slug/reservation', async (req, res) => {
+router.post('/:slug/reservation', publicFormLimiter, async (req, res) => {
   const company = await findCompany(req.params.slug);
   if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
 
@@ -105,7 +106,7 @@ router.post('/:slug/reservation', async (req, res) => {
 });
 
 // POST /api/public/:slug/appointment  (diş hekimi randevu)
-router.post('/:slug/appointment', async (req, res) => {
+router.post('/:slug/appointment', publicFormLimiter, async (req, res) => {
   const company = await findCompany(req.params.slug);
   if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
 
@@ -124,7 +125,7 @@ router.post('/:slug/appointment', async (req, res) => {
 });
 
 // POST /api/public/:slug/contact
-router.post('/:slug/contact', async (req, res) => {
+router.post('/:slug/contact', publicFormLimiter, async (req, res) => {
   const company = await findCompany(req.params.slug);
   if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
 

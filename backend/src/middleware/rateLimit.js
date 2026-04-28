@@ -18,3 +18,13 @@ exports.apiLimiter = rateLimit({
   legacyHeaders: false,
   message: { message: 'İstek limiti aşıldı. Bir dakika sonra tekrar deneyin.' },
 });
+
+// Public form/rezervasyon: 10 istek / 10 dakika (spam önleme)
+exports.publicFormLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Çok fazla istek gönderildi. 10 dakika sonra tekrar deneyin.' },
+  keyGenerator: (req) => req.ip + (req.params.slug || ''),
+});

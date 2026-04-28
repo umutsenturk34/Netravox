@@ -3,9 +3,10 @@ const FormSubmission = require('../models/FormSubmission');
 const { authenticate } = require('../middleware/auth');
 const { resolveTenant } = require('../middleware/tenant');
 const { requirePermission } = require('../middleware/rbac');
+const { publicFormLimiter } = require('../middleware/rateLimit');
 
 // PUBLIC: Firma web sitesinden form gönderimi (auth gerektirmez)
-router.post('/submit', async (req, res) => {
+router.post('/submit', publicFormLimiter, async (req, res) => {
   const { tenantId, formType, fields, kvkkConsent } = req.body;
   if (!tenantId || !fields || !kvkkConsent) {
     return res.status(400).json({ message: 'tenantId, fields ve kvkkConsent gerekli' });

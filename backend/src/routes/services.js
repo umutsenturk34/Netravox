@@ -6,17 +6,17 @@ const { requirePermission } = require('../middleware/rbac');
 
 router.use(authenticate, resolveTenant);
 
-router.get('/', async (req, res) => {
+router.get('/', requirePermission('services.read'), async (req, res) => {
   const services = await Service.find({ tenantId: req.tenantId }).sort('order');
   res.json(services);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requirePermission('services.create'), async (req, res) => {
   const service = await Service.create({ ...req.body, tenantId: req.tenantId });
   res.status(201).json(service);
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requirePermission('services.update'), async (req, res) => {
   const service = await Service.findOneAndUpdate(
     { _id: req.params.id, tenantId: req.tenantId },
     req.body,
@@ -26,8 +26,9 @@ router.patch('/:id', async (req, res) => {
   res.json(service);
 });
 
-router.delete('/:id', async (req, res) => {
-  await Service.findOneAndDelete({ _id: req.params.id, tenantId: req.tenantId });
+router.delete('/:id', requirePermission('services.delete'), async (req, res) => {
+  const service = await Service.findOneAndDelete({ _id: req.params.id, tenantId: req.tenantId });
+  if (!service) return res.status(404).json({ message: 'Hizmet bulunamadı' });
   res.json({ message: 'Hizmet silindi' });
 });
 
