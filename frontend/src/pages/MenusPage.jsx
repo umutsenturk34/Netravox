@@ -119,7 +119,7 @@ export default function MenusPage() {
         <Button onClick={() => setShowCreateMenu(true)}>+ Yeni Menü</Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
         {/* Menü listesi */}
         <div>
           <p className="text-xs font-semibold mb-3 uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Menüler</p>

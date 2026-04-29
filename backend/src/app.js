@@ -78,6 +78,8 @@ app.use('/api/roles', require('./routes/roles'));
 app.use('/api/services', require('./routes/services'));
 app.use('/api/properties', require('./routes/properties'));
 app.use('/api/analytics', require('./routes/analytics'));
+app.use('/api/blog', require('./routes/blog'));
+app.use('/api/faqs', require('./routes/faqs'));
 app.use('/api/public', require('./routes/public'));
 
 // 404

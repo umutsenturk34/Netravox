@@ -6,14 +6,33 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [activeTenantId, setActiveTenantId] = useState(null);
+  const [activeCompany, setActiveCompany] = useState(null);
+  const [companyLoading, setCompanyLoading] = useState(false);
   const [loading, setLoading] = useState(true);
+
+  async function fetchCompany(tenantId) {
+    if (!tenantId) { setActiveCompany(null); return; }
+    setCompanyLoading(true);
+    try {
+      const { data } = await api.get(`/companies/${tenantId}`);
+      setActiveCompany(data);
+    } catch (_e) {
+      setActiveCompany(null);
+    } finally {
+      setCompanyLoading(false);
+    }
+  }
 
   useEffect(() => {
     const token = localStorage.getItem('accessToken');
     const tenant = localStorage.getItem('activeTenantId');
     if (token) {
       api.get('/auth/me')
-        .then(({ data }) => { setUser(data); setActiveTenantId(tenant); })
+        .then(({ data }) => {
+          setUser(data);
+          setActiveTenantId(tenant);
+          return fetchCompany(tenant);
+        })
         .catch(() => localStorage.clear())
         .finally(() => setLoading(false));
     } else {
@@ -32,6 +51,7 @@ export const AuthProvider = ({ children }) => {
     if (firstTenant) {
       localStorage.setItem('activeTenantId', firstTenant);
       setActiveTenantId(firstTenant);
+      await fetchCompany(firstTenant);
     }
     return data.user;
   };
@@ -47,10 +67,11 @@ export const AuthProvider = ({ children }) => {
   const switchTenant = (tenantId) => {
     localStorage.setItem('activeTenantId', tenantId);
     setActiveTenantId(tenantId);
+    fetchCompany(tenantId);
   };
 
   return (
-    <AuthContext.Provider value={{ user, activeTenantId, loading, login, logout, switchTenant }}>
+    <AuthContext.Provider value={{ user, activeTenantId, activeCompany, companyLoading, loading, login, logout, switchTenant }}>
       {children}
     </AuthContext.Provider>
   );

@@ -21,6 +21,7 @@ const TABS = [
   { id: 'gorsel', label: 'Görseller' },
   { id: 'degerler', label: 'Değerler' },
   { id: 'email', label: 'E-posta Şablonları' },
+  { id: 'smtp', label: 'SMTP Ayarları' },
   { id: 'sosyal', label: 'Sosyal & Diğer' },
   { id: 'entegrasyon', label: 'Entegrasyonlar' },
 ];
@@ -44,11 +45,15 @@ const defaultContent = {
   reservationSlots: [],
 };
 
+const DEFAULT_SMTP = { enabled: false, host: '', port: 587, secure: false, user: '', pass: '', fromName: '' };
+
 export default function CompanySettingsPage() {
   const { activeTenantId } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState('genel');
+  const [smtpForm, setSmtpForm] = useState(DEFAULT_SMTP);
+  const [testingMail, setTestingMail] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
@@ -175,6 +180,39 @@ export default function CompanySettingsPage() {
     onError: (err) => toast.error(err.response?.data?.message || 'Kaydedilemedi'),
   });
 
+  const { data: smtpData } = useQuery({
+    queryKey: ['company-smtp', activeTenantId],
+    queryFn: () => api.get(`/companies/${activeTenantId}/smtp`).then((r) => r.data),
+    enabled: !!activeTenantId && activeTab === 'smtp',
+  });
+
+  useEffect(() => {
+    if (smtpData) setSmtpForm({ ...DEFAULT_SMTP, ...smtpData });
+  }, [smtpData]);
+
+  const smtpMutation = useMutation({
+    mutationFn: (data) => api.patch(`/companies/${activeTenantId}/smtp`, data).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['company-smtp', activeTenantId] });
+      toast.success('SMTP ayarları kaydedildi');
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Kaydedilemedi'),
+  });
+
+  async function testSmtp() {
+    setTestingMail(true);
+    try {
+      const { data } = await api.post(`/companies/${activeTenantId}/smtp/test`);
+      toast.success(data.message);
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Test maili gönderilemedi');
+    } finally {
+      setTestingMail(false);
+    }
+  }
+
+  const setSmtp = (key, value) => setSmtpForm((p) => ({ ...p, [key]: value }));
+
   const set = (path, value) => {
     setForm((prev) => {
       const next = { ...prev };
@@ -217,7 +255,7 @@ export default function CompanySettingsPage() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Firma Ayarları</h1>
         <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}>
@@ -226,20 +264,22 @@ export default function CompanySettingsPage() {
       </div>
 
       {/* Tab bar */}
-      <div className="flex gap-1 mb-6 border-b" style={{ borderColor: 'var(--border)' }}>
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors"
-            style={{
-              borderColor: activeTab === t.id ? 'var(--primary)' : 'transparent',
-              color: activeTab === t.id ? 'var(--primary)' : 'var(--text-secondary)',
-            }}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="mb-6 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="flex gap-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className="px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap shrink-0"
+              style={{
+                borderColor: activeTab === t.id ? 'var(--primary)' : 'transparent',
+                color: activeTab === t.id ? 'var(--primary)' : 'var(--text-secondary)',
+              }}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-6">
@@ -563,6 +603,121 @@ export default function CompanySettingsPage() {
                 placeholder="maalesef talep ettiğiniz tarih ve saatte müsait masa bulunamamaktadır."
                 rows={3} />
             </Section>
+          </>
+        )}
+
+        {/* ── SMTP AYARLARI ── */}
+        {activeTab === 'smtp' && (
+          <>
+            <Section title="Giden Mail Sunucusu (SMTP)">
+              <div className="rounded-lg p-4 text-sm mb-2" style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}>
+                <p className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Bu ne işe yarar?</p>
+                <p>
+                  İletişim formunu dolduran ziyaretçilere otomatik onay maili gönderilir. Burada firmanıza ait kurumsal
+                  SMTP bilgilerini girerek maillerinizin kendi adresinizden gitmesini sağlayabilirsiniz.
+                </p>
+              </div>
+
+              {/* Enable toggle */}
+              <label className="flex items-center gap-3 cursor-pointer select-none">
+                <div
+                  onClick={() => setSmtp('enabled', !smtpForm.enabled)}
+                  className="relative w-11 h-6 rounded-full transition-colors"
+                  style={{ background: smtpForm.enabled ? 'var(--primary)' : 'var(--border)' }}
+                >
+                  <span
+                    className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+                    style={{ transform: smtpForm.enabled ? 'translateX(20px)' : 'translateX(0)' }}
+                  />
+                </div>
+                <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {smtpForm.enabled ? 'Özel SMTP etkin' : 'Özel SMTP devre dışı'}
+                </span>
+              </label>
+
+              {smtpForm.enabled && (
+                <div className="space-y-4 pt-2">
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="SMTP Sunucu (Host)"
+                      value={smtpForm.host}
+                      onChange={(e) => setSmtp('host', e.target.value)}
+                      placeholder="mail.netravox.com"
+                    />
+                    <Input
+                      label="Port"
+                      value={smtpForm.port}
+                      onChange={(e) => setSmtp('port', e.target.value)}
+                      placeholder="587"
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-2 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={smtpForm.secure}
+                      onChange={(e) => setSmtp('secure', e.target.checked)}
+                      className="w-4 h-4 rounded"
+                      style={{ accentColor: 'var(--primary)' }}
+                    />
+                    <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      SSL/TLS kullan (port 465 için işaretle)
+                    </span>
+                  </label>
+
+                  <Input
+                    label="Kullanıcı Adı (E-posta Adresi)"
+                    value={smtpForm.user}
+                    onChange={(e) => setSmtp('user', e.target.value)}
+                    placeholder="info@netravox.com"
+                  />
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                      Şifre
+                    </label>
+                    <input
+                      type="password"
+                      value={smtpForm.pass}
+                      onChange={(e) => setSmtp('pass', e.target.value)}
+                      placeholder={smtpData?.pass === '••••••••' ? 'Kayıtlı şifre mevcut — değiştirmek için girin' : 'Mail hesabı şifresi'}
+                      className="w-full rounded-lg px-3.5 py-2.5 border outline-none text-sm"
+                      style={{ background: 'var(--bg-base)', borderColor: 'var(--border)', color: 'var(--text-primary)', fontSize: '16px' }}
+                    />
+                  </div>
+
+                  <Input
+                    label="Gönderici Adı"
+                    value={smtpForm.fromName}
+                    onChange={(e) => setSmtp('fromName', e.target.value)}
+                    placeholder="Netravox"
+                  />
+                </div>
+              )}
+            </Section>
+
+            <div className="flex items-center gap-3">
+              <Button
+                onClick={() => smtpMutation.mutate(smtpForm)}
+                disabled={smtpMutation.isPending}
+              >
+                {smtpMutation.isPending ? 'Kaydediliyor...' : 'SMTP Ayarlarını Kaydet'}
+              </Button>
+              {smtpForm.enabled && (
+                <button
+                  onClick={testSmtp}
+                  disabled={testingMail}
+                  className="px-4 py-2 rounded-lg border text-sm font-medium transition-colors"
+                  style={{
+                    borderColor: 'var(--border)',
+                    color: testingMail ? 'var(--text-muted)' : 'var(--text-primary)',
+                    background: 'var(--bg-surface)',
+                  }}
+                >
+                  {testingMail ? 'Gönderiliyor...' : '✉ Test Maili Gönder'}
+                </button>
+              )}
+            </div>
           </>
         )}
 

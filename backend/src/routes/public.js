@@ -7,9 +7,12 @@ const Reservation = require('../models/Reservation');
 const FormSubmission = require('../models/FormSubmission');
 const Service = require('../models/Service');
 const Property = require('../models/Property');
+const Faq = require('../models/Faq');
+const BlogPost = require('../models/BlogPost');
 const { publicFormLimiter } = require('../middleware/rateLimit');
 const { validate } = require('../middleware/validate');
 const { safeStr } = require('../utils/query');
+const { sendContactConfirmation } = require('../utils/mailer');
 
 const findCompany = async (slug) => Company.findOne({ slug, isActive: true });
 
@@ -128,6 +131,46 @@ router.post('/:slug/appointment', publicFormLimiter, validate('appointment'), as
   res.status(201).json({ message: 'Randevu talebiniz alındı' });
 });
 
+// GET /api/public/:slug/faqs
+router.get('/:slug/faqs', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+
+  const faqs = await Faq.find({ tenantId: company._id, isActive: true }).sort('order');
+  res.json(faqs.map((f) => ({
+    _id: f._id,
+    question: f.question,
+    answer: f.answer,
+    order: f.order,
+  })));
+});
+
+// GET /api/public/:slug/blog
+router.get('/:slug/blog', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+
+  const posts = await BlogPost.find({ tenantId: company._id, status: 'published' })
+    .sort('-publishedAt')
+    .limit(20)
+    .select('title slug excerpt coverImage publishedAt author tags');
+  res.json(posts);
+});
+
+// GET /api/public/:slug/blog/:postSlug
+router.get('/:slug/blog/:postSlug', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+
+  const post = await BlogPost.findOne({
+    tenantId: company._id,
+    slug: req.params.postSlug,
+    status: 'published',
+  });
+  if (!post) return res.status(404).json({ message: 'Blog yazısı bulunamadı' });
+  res.json(post);
+});
+
 // POST /api/public/:slug/contact
 router.post('/:slug/contact', publicFormLimiter, validate('contact'), async (req, res) => {
   const company = await findCompany(req.params.slug);
@@ -141,6 +184,19 @@ router.post('/:slug/contact', publicFormLimiter, validate('contact'), async (req
     tenantId: company._id, formType: 'contact',
     fields: { name, email, message }, kvkkConsent: true, ipAddress: req.ip || null,
   });
+
+  const s = company.smtpSettings;
+  const smtpOverride = s?.enabled && s?.host && s?.user && s?.pass
+    ? { host: s.host, port: s.port, secure: s.secure, user: s.user, pass: s.pass, fromName: s.fromName }
+    : undefined;
+
+  sendContactConfirmation({
+    toEmail: email,
+    toName: name,
+    companyName: company.name || 'Netravox',
+    smtpOverride,
+  }).catch(() => {});
+
   res.status(201).json({ message: 'Mesajınız iletildi' });
 });
 
