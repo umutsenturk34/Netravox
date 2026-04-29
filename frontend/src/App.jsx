@@ -23,6 +23,9 @@ import ProfilePage from './pages/ProfilePage';
 import NotificationsPage from './pages/NotificationsPage';
 import DentalServicesPage from './pages/DentalServicesPage';
 import PropertiesManagePage from './pages/PropertiesManagePage';
+import BlogListPage from './pages/BlogListPage';
+import BlogEditorPage from './pages/BlogEditorPage';
+import FaqManagePage from './pages/FaqManagePage';
 
 import PanelLayout from './components/layout/PanelLayout';
 
@@ -67,6 +70,10 @@ export default function App() {
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="dental/services" element={<DentalServicesPage />} />
           <Route path="real-estate/properties" element={<PropertiesManagePage />} />
+          <Route path="blog" element={<BlogListPage />} />
+          <Route path="blog/new" element={<BlogEditorPage />} />
+          <Route path="blog/:id/edit" element={<BlogEditorPage />} />
+          <Route path="faqs" element={<FaqManagePage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Route>

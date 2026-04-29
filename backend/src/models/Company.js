@@ -7,7 +7,7 @@ const companySchema = new mongoose.Schema({
   subdomain: { type: String, default: null },
   sector: {
     type: String,
-    enum: ['restaurant', 'dental', 'beauty', 'hotel', 'service', 'other'],
+    enum: ['restaurant', 'dental', 'beauty', 'hotel', 'service', 'real_estate', 'other'],
     default: 'other',
   },
   branding: {
@@ -83,6 +83,15 @@ const companySchema = new mongoose.Schema({
     confirmedMessage: { type: String, default: null },
     rejectedSubject: { type: String, default: null },
     rejectedMessage: { type: String, default: null },
+  },
+  smtpSettings: {
+    enabled:  { type: Boolean, default: false },
+    host:     { type: String,  default: null },
+    port:     { type: Number,  default: 587 },
+    secure:   { type: Boolean, default: false },
+    user:     { type: String,  default: null },
+    pass:     { type: String,  default: null },
+    fromName: { type: String,  default: null },
   },
   integrations: {
     analyticsPropertyId: { type: String, default: null }, // GA4 numeric property ID (örn: 323456789)

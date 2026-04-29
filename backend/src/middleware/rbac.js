@@ -8,6 +8,7 @@ const ROLE_PERMISSIONS = {
     'roles.*', 'pages.*', 'media.*', 'menus.*', 'seo.*', 'redirects.*',
     'restaurant.*', 'reservations.*', 'forms.*',
     'services.*', 'properties.*',
+    'blog.*', 'faqs.*',
     'settings.*', 'languages.*',
   ],
   company_admin: [
@@ -16,11 +17,13 @@ const ROLE_PERMISSIONS = {
     'roles.*', 'pages.*', 'media.*', 'menus.*', 'seo.*', 'redirects.*',
     'restaurant.*', 'reservations.*', 'forms.*',
     'services.*', 'properties.*',
+    'blog.*', 'faqs.*',
     'settings.read', 'settings.update', 'languages.*',
   ],
   seo_specialist: [
     'pages.read', 'seo.*', 'redirects.*', 'media.read',
     'services.read', 'properties.read',
+    'blog.read', 'faqs.read',
   ],
   content_editor: [
     'pages.read', 'pages.create', 'pages.update', 'pages.publish',
@@ -28,6 +31,7 @@ const ROLE_PERMISSIONS = {
     'restaurant.read', 'restaurant.create', 'restaurant.update',
     'services.read', 'services.create', 'services.update',
     'properties.read', 'properties.create', 'properties.update',
+    'blog.*', 'faqs.*',
   ],
   media_manager: ['media.*'],
   reservation_manager: ['reservations.*', 'forms.*'],
@@ -35,6 +39,7 @@ const ROLE_PERMISSIONS = {
     'pages.read', 'media.read', 'menus.read',
     'restaurant.read', 'reservations.read', 'forms.read', 'seo.read',
     'services.read', 'properties.read',
+    'blog.read', 'faqs.read',
   ],
 };
 

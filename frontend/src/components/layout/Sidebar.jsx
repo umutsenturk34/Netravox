@@ -4,19 +4,23 @@ import {
   LayoutDashboard, FileText, Image, Menu, UtensilsCrossed,
   HeartPulse, Building2, Calendar, Mail, Bell, Search,
   ArrowRightLeft, Globe, Users, ShieldCheck, Settings, Building,
+  BookOpen, HelpCircle,
 } from 'lucide-react';
 
+// sectors: hangi sektörler bu menü öğesini görür. Yoksa herkese göster.
 const navItems = [
   { label: 'Dashboard',              to: '/dashboard',              icon: LayoutDashboard },
   { label: 'Sayfalar',               to: '/pages',                  icon: FileText },
   { label: 'Medya',                  to: '/media',                  icon: Image },
   { label: 'Navigasyon',             to: '/menus',                  icon: Menu },
-  { label: 'Restoran Menüsü',        to: '/restaurant/menu',        icon: UtensilsCrossed },
-  { label: 'Diş Hekimi Hizmetleri', to: '/dental/services',        icon: HeartPulse },
-  { label: 'Emlak İlanları',         to: '/real-estate/properties', icon: Building2 },
-  { label: 'Rezervasyonlar',         to: '/reservations',           icon: Calendar },
+  { label: 'Restoran Menüsü',        to: '/restaurant/menu',        icon: UtensilsCrossed,  sectors: ['restaurant'] },
+  { label: 'Diş Hekimi Hizmetleri', to: '/dental/services',        icon: HeartPulse,        sectors: ['dental'] },
+  { label: 'Emlak İlanları',         to: '/real-estate/properties', icon: Building2,         sectors: ['real_estate'] },
+  { label: 'Rezervasyonlar',         to: '/reservations',           icon: Calendar,          sectors: ['restaurant', 'dental', 'beauty', 'hotel', 'service'] },
   { label: 'Form Gönderileri',       to: '/forms',                  icon: Mail },
   { label: 'Bildirimler',            to: '/notifications',          icon: Bell },
+  { label: 'Blog Yazıları',          to: '/blog',                   icon: BookOpen },
+  { label: 'SSS Yönetimi',          to: '/faqs',                   icon: HelpCircle },
   { label: 'SEO',                    to: '/seo',                    icon: Search },
   { label: 'Redirect',               to: '/redirects',              icon: ArrowRightLeft },
   { label: 'Diller',                 to: '/languages',              icon: Globe },
@@ -30,7 +34,14 @@ const adminItems = [
 ];
 
 export default function Sidebar() {
-  const { user } = useAuth();
+  const { user, activeCompany, companyLoading } = useAuth();
+
+  const visibleItems = navItems.filter((item) => {
+    if (!item.sectors) return true;
+    if (user?.isSuperAdmin) return true;
+    if (companyLoading || !activeCompany) return false;
+    return item.sectors.includes(activeCompany.sector);
+  });
 
   return (
     <aside
@@ -56,7 +67,7 @@ export default function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3 px-2.5 space-y-0.5">
-        {navItems.map(({ label, to, icon: Icon }) => (
+        {visibleItems.map(({ label, to, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}

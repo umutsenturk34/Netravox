@@ -63,6 +63,43 @@ const seed = async () => {
     console.log(`→ Admin kullanıcısı zaten mevcut: ${adminEmail}`);
   }
 
+  // Netravox firması (pazarlama sitesi için)
+  let netravoxCompany = await Company.findOne({ slug: 'netravox' });
+  if (!netravoxCompany) {
+    netravoxCompany = await Company.create({
+      name: 'Netravox',
+      slug: 'netravox',
+      sector: 'other',
+      settings: { defaultLanguage: 'tr', supportedLanguages: ['tr', 'en'] },
+    });
+    console.log('✓ Netravox firması oluşturuldu');
+  } else {
+    console.log('→ Netravox firması zaten mevcut');
+  }
+
+  // Netravox company admin kullanıcısı
+  const netravoxEmail = 'netravox@netravox.com';
+  const netravoxPassword = 'Netravox2024!';
+  const companyAdminRole = await Role.findOne({ name: 'company_admin', tenantId: null });
+
+  const netravoxUserExists = await User.findOne({ email: netravoxEmail });
+  if (!netravoxUserExists) {
+    const passwordHash = await User.hashPassword(netravoxPassword);
+    await User.create({
+      name: 'Netravox Admin',
+      email: netravoxEmail,
+      passwordHash,
+      isSuperAdmin: false,
+      companyRoles: companyAdminRole
+        ? [{ tenantId: netravoxCompany._id, roleId: companyAdminRole._id }]
+        : [],
+    });
+    console.log(`✓ Netravox kullanıcısı oluşturuldu: ${netravoxEmail} / ${netravoxPassword}`);
+    console.log('  ⚠ Şifreyi giriş sonrası değiştir!');
+  } else {
+    console.log(`→ Netravox kullanıcısı zaten mevcut: ${netravoxEmail}`);
+  }
+
   console.log('\nSeed tamamlandı.');
   process.exit(0);
 };
