@@ -26,6 +26,7 @@ const companySchema = new mongoose.Schema({
   },
   contact: {
     phone: { type: String, default: null },
+    whatsapp: { type: String, default: null },
     email: { type: String, default: null },
     address: { type: String, default: null },
     city: { type: String, default: null },
@@ -83,6 +84,10 @@ const companySchema = new mongoose.Schema({
     confirmedMessage: { type: String, default: null },
     rejectedSubject: { type: String, default: null },
     rejectedMessage: { type: String, default: null },
+  },
+  features: {
+    aiContent: { type: Boolean, default: false },
+    whatsapp:  { type: Boolean, default: false },
   },
   smtpSettings: {
     enabled:  { type: Boolean, default: false },

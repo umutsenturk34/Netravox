@@ -31,7 +31,7 @@ export default function Modal({ open, isOpen, onClose, title, children, footer, 
             ×
           </button>
         </div>
-        <div className="px-6 py-5">{children}</div>
+        <div className="px-6 py-5 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 8rem)' }}>{children}</div>
         {footer && (
           <div className="px-6 py-4 border-t" style={{ borderColor: 'var(--border)' }}>
             {footer}
