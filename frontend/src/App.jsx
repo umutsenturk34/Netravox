@@ -35,6 +35,12 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" replace />;
 };
 
+const SuperAdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  return user?.isSuperAdmin ? children : <Navigate to="/dashboard" replace />;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -66,9 +72,10 @@ export default function App() {
           <Route path="settings" element={<CompanySettingsPage />} />
           <Route path="companies" element={<CompaniesPage />} />
           <Route path="users" element={<UsersPage />} />
-          <Route path="roles" element={<RolesPage />} />
+          <Route path="roles" element={<SuperAdminRoute><RolesPage /></SuperAdminRoute>} />
           <Route path="notifications" element={<NotificationsPage />} />
           <Route path="dental/services" element={<DentalServicesPage />} />
+          <Route path="services" element={<DentalServicesPage />} />
           <Route path="real-estate/properties" element={<PropertiesManagePage />} />
           <Route path="blog" element={<BlogListPage />} />
           <Route path="blog/new" element={<BlogEditorPage />} />

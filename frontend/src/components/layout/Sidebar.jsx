@@ -4,7 +4,7 @@ import {
   LayoutDashboard, FileText, Image, Menu, UtensilsCrossed,
   HeartPulse, Building2, Calendar, Mail, Bell, Search,
   ArrowRightLeft, Globe, Users, ShieldCheck, Settings, Building,
-  BookOpen, HelpCircle,
+  BookOpen, HelpCircle, Package,
 } from 'lucide-react';
 
 // sectors: hangi sektörler bu menü öğesini görür. Yoksa herkese göster.
@@ -15,6 +15,7 @@ const navItems = [
   { label: 'Navigasyon',             to: '/menus',                  icon: Menu },
   { label: 'Restoran Menüsü',        to: '/restaurant/menu',        icon: UtensilsCrossed,  sectors: ['restaurant'] },
   { label: 'Diş Hekimi Hizmetleri', to: '/dental/services',        icon: HeartPulse,        sectors: ['dental'] },
+  { label: 'Ürünler & Hizmetler',   to: '/services',               icon: Package,           sectors: ['other', 'beauty', 'service', 'hotel'] },
   { label: 'Emlak İlanları',         to: '/real-estate/properties', icon: Building2,         sectors: ['real_estate'] },
   { label: 'Rezervasyonlar',         to: '/reservations',           icon: Calendar,          sectors: ['restaurant', 'dental', 'beauty', 'hotel', 'service'] },
   { label: 'Form Gönderileri',       to: '/forms',                  icon: Mail },
@@ -25,7 +26,7 @@ const navItems = [
   { label: 'Redirect',               to: '/redirects',              icon: ArrowRightLeft },
   { label: 'Diller',                 to: '/languages',              icon: Globe },
   { label: 'Kullanıcılar',           to: '/users',                  icon: Users },
-  { label: 'Roller',                 to: '/roles',                  icon: ShieldCheck },
+  { label: 'Roller',                 to: '/roles',                  icon: ShieldCheck, superAdminOnly: true },
   { label: 'Firma Ayarları',         to: '/settings',               icon: Settings },
 ];
 
@@ -37,6 +38,7 @@ export default function Sidebar() {
   const { user, activeCompany, companyLoading } = useAuth();
 
   const visibleItems = navItems.filter((item) => {
+    if (item.superAdminOnly && !user?.isSuperAdmin) return false;
     if (!item.sectors) return true;
     if (user?.isSuperAdmin) return true;
     if (companyLoading || !activeCompany) return false;

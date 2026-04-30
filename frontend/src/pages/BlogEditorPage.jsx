@@ -3,10 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import api from '../api/client';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import Button from '../components/ui/Button';
-import { Input, Textarea, Select } from '../components/ui/Input';
+import { Input, Textarea, Select, ImageUrlInput } from '../components/ui/Input';
 import RichTextEditor from '../components/ui/RichTextEditor';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles, X } from 'lucide-react';
 
 const STATUSES = [
   { value: 'draft',     label: 'Taslak' },
@@ -43,36 +44,44 @@ export default function BlogEditorPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { activeCompany } = useAuth();
   const isNew = !id;
   const [form, setForm] = useState(empty);
   const [tab, setTab] = useState('tr');
   const [seoOpen, setSeoOpen] = useState(false);
   const [slugTouched, setSlugTouched] = useState(false);
+  const [aiModal, setAiModal] = useState(false);
+  const [aiTitle, setAiTitle] = useState('');
+  const [aiLang, setAiLang] = useState('tr');
+  const [aiLoading, setAiLoading] = useState(false);
+  const aiEnabled = activeCompany?.features?.aiContent;
 
-  const { isLoading } = useQuery({
+  const { isLoading, data: postData } = useQuery({
     queryKey: ['blog-post', id],
     queryFn: () => api.get(`/blog/${id}`).then((r) => r.data),
     enabled: !isNew,
-    onSuccess: (data) => {
-      setForm({
-        title:      { tr: data.title?.tr || '', en: data.title?.en || '' },
-        slug:       data.slug || '',
-        excerpt:    { tr: data.excerpt?.tr || '', en: data.excerpt?.en || '' },
-        content:    { tr: data.content?.tr || '', en: data.content?.en || '' },
-        coverImage: data.coverImage || '',
-        tags:       (data.tags || []).join(', '),
-        author:     data.author || '',
-        status:     data.status || 'draft',
-        seo: {
-          metaTitle:    { tr: data.seo?.metaTitle?.tr || '', en: data.seo?.metaTitle?.en || '' },
-          metaDesc:     { tr: data.seo?.metaDesc?.tr || '', en: data.seo?.metaDesc?.en || '' },
-          ogImage:      data.seo?.ogImage || '',
-          canonicalUrl: data.seo?.canonicalUrl || '',
-        },
-      });
-      setSlugTouched(true);
-    },
   });
+
+  useEffect(() => {
+    if (!postData) return;
+    setForm({
+      title:      { tr: postData.title?.tr || '', en: postData.title?.en || '' },
+      slug:       postData.slug || '',
+      excerpt:    { tr: postData.excerpt?.tr || '', en: postData.excerpt?.en || '' },
+      content:    { tr: postData.content?.tr || '', en: postData.content?.en || '' },
+      coverImage: postData.coverImage || '',
+      tags:       (postData.tags || []).join(', '),
+      author:     postData.author || '',
+      status:     postData.status || 'draft',
+      seo: {
+        metaTitle:    { tr: postData.seo?.metaTitle?.tr || '', en: postData.seo?.metaTitle?.en || '' },
+        metaDesc:     { tr: postData.seo?.metaDesc?.tr || '', en: postData.seo?.metaDesc?.en || '' },
+        ogImage:      postData.seo?.ogImage || '',
+        canonicalUrl: postData.seo?.canonicalUrl || '',
+      },
+    });
+    setSlugTouched(true);
+  }, [postData]);
 
   const save = useMutation({
     mutationFn: (data) =>
@@ -116,6 +125,35 @@ export default function BlogEditorPage() {
     });
   }
 
+  async function handleAiGenerate() {
+    if (!aiTitle.trim()) { toast.error('Başlık giriniz'); return; }
+    setAiLoading(true);
+    try {
+      const { data } = await api.post('/blog/generate', { title: aiTitle, language: aiLang });
+      setForm((f) => ({
+        ...f,
+        title:   { ...f.title,   [aiLang]: data.title   || f.title[aiLang]   },
+        excerpt: { ...f.excerpt, [aiLang]: data.excerpt  || f.excerpt[aiLang] },
+        content: { ...f.content, [aiLang]: data.content  || f.content[aiLang] },
+        slug:    (!slugTouched && aiLang === 'tr') ? (data.slug || f.slug) : f.slug,
+        tags:    data.tags?.join(', ') || f.tags,
+        seo: {
+          ...f.seo,
+          metaTitle: { ...f.seo.metaTitle, [aiLang]: data.metaTitle || '' },
+          metaDesc:  { ...f.seo.metaDesc,  [aiLang]: data.metaDescription || '' },
+        },
+      }));
+      if (data.slug && aiLang === 'tr' && !slugTouched) setSlugTouched(false);
+      setTab(aiLang);
+      setAiModal(false);
+      toast.success('Blog yazısı oluşturuldu! İçeriği inceleyip düzenleyebilirsiniz.');
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'AI içerik üretilemedi');
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
   if (!isNew && isLoading) {
     return <div className="p-6 text-sm" style={{ color: 'var(--text-muted)' }}>Yükleniyor...</div>;
   }
@@ -132,6 +170,17 @@ export default function BlogEditorPage() {
             {isNew ? 'Yeni Blog Yazısı' : 'Blog Yazısı Düzenle'}
           </h1>
         </div>
+        {aiEnabled && (
+          <button
+            type="button"
+            onClick={() => { setAiTitle(form.title.tr || ''); setAiModal(true); }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-semibold transition-all"
+            style={{ background: 'linear-gradient(135deg,#4338ca,#7c3aed)', color: '#fff' }}
+          >
+            <Sparkles size={14} />
+            AI ile Üret
+          </button>
+        )}
         <Select
           value={form.status}
           onChange={(e) => setField('status', e.target.value)}
@@ -209,11 +258,11 @@ export default function BlogEditorPage() {
           style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}
         >
           <h3 className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Yazı Bilgileri</h3>
-          <Input
+          <ImageUrlInput
             label="Kapak Görseli URL"
             value={form.coverImage}
             onChange={(e) => setField('coverImage', e.target.value)}
-            placeholder="https://..."
+            hint="1200×630px"
           />
           <div className="grid grid-cols-2 gap-4">
             <Input
@@ -258,10 +307,11 @@ export default function BlogEditorPage() {
                 onChange={(e) => setSeoLang('metaDesc', tab, e.target.value)}
                 rows={3}
               />
-              <Input
+              <ImageUrlInput
                 label="OG Görsel URL"
                 value={form.seo.ogImage}
                 onChange={(e) => setSeoField('ogImage', e.target.value)}
+                hint="1200×630px"
               />
               <Input
                 label="Canonical URL"
@@ -272,6 +322,92 @@ export default function BlogEditorPage() {
           )}
         </div>
       </form>
+
+      {/* AI Üretim Modal */}
+      {aiModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.55)' }}>
+          <div className="w-full max-w-md rounded-2xl shadow-2xl overflow-hidden" style={{ background: 'var(--bg-surface)' }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4" style={{ background: 'linear-gradient(135deg,#1e1b4b,#4338ca)', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+              <div className="flex items-center gap-2">
+                <Sparkles size={18} color="#c7d2fe" />
+                <span className="font-bold text-white text-sm">AI ile Blog Yaz</span>
+              </div>
+              <button onClick={() => setAiModal(false)} className="text-white/60 hover:text-white transition-colors">
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-4">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                Başlığı girin — sektörünüze özel, SEO uyumlu tam blog yazısı otomatik oluşturulur.
+              </p>
+
+              <div>
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Blog Başlığı</label>
+                <input
+                  autoFocus
+                  value={aiTitle}
+                  onChange={(e) => setAiTitle(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAiGenerate()}
+                  placeholder="Örn: Restoranlarda Dijital Menü Kullanımı"
+                  className="w-full rounded-xl px-4 py-3 text-sm border outline-none"
+                  style={{ background: 'var(--bg-base)', borderColor: 'var(--border)', color: 'var(--text-primary)', fontSize: '16px' }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold mb-1.5 uppercase tracking-wide" style={{ color: 'var(--text-secondary)' }}>Dil</label>
+                <div className="flex gap-2">
+                  {[{ v: 'tr', l: '🇹🇷 Türkçe' }, { v: 'en', l: '🇬🇧 İngilizce' }].map(({ v, l }) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setAiLang(v)}
+                      className="flex-1 py-2.5 rounded-xl text-sm font-medium border transition-all"
+                      style={{
+                        borderColor: aiLang === v ? '#6366f1' : 'var(--border)',
+                        background: aiLang === v ? '#eef2ff' : 'var(--bg-base)',
+                        color: aiLang === v ? '#4338ca' : 'var(--text-secondary)',
+                      }}
+                    >
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {aiLoading && (
+                <div className="rounded-xl p-4 text-center text-sm" style={{ background: '#eef2ff', color: '#4338ca' }}>
+                  <div className="animate-pulse font-medium">✨ Blog yazısı oluşturuluyor...</div>
+                  <div className="text-xs mt-1 opacity-70">Bu işlem 10-20 saniye sürebilir</div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="flex gap-3 px-6 pb-6">
+              <button
+                onClick={() => setAiModal(false)}
+                disabled={aiLoading}
+                className="flex-1 py-2.5 rounded-xl border text-sm font-medium transition-colors"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)', background: 'var(--bg-base)' }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={handleAiGenerate}
+                disabled={aiLoading || !aiTitle.trim()}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50"
+                style={{ background: 'linear-gradient(135deg,#4338ca,#7c3aed)' }}
+              >
+                {aiLoading ? 'Oluşturuluyor...' : '✨ Üret'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

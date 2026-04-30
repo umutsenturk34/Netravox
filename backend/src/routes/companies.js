@@ -56,6 +56,18 @@ router.patch('/:id', authenticate, async (req, res) => {
   res.json(company);
 });
 
+// PATCH /api/companies/:id/features — sadece super admin
+router.patch('/:id/features', authenticate, superAdmin, async (req, res) => {
+  const { aiContent, whatsapp } = req.body;
+  const update = {};
+  if (aiContent !== undefined) update['features.aiContent'] = !!aiContent;
+  if (whatsapp  !== undefined) update['features.whatsapp']  = !!whatsapp;
+
+  const company = await Company.findByIdAndUpdate(req.params.id, { $set: update }, { new: true });
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+  res.json({ message: 'Özellikler kaydedildi', features: company.features });
+});
+
 // GET /api/companies/:id/smtp — şifreyi maskeli döndür
 router.get('/:id/smtp', authenticate, async (req, res) => {
   if (!req.user.isSuperAdmin) {

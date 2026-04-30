@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
-import { Input, Select } from '../components/ui/Input';
+import { Input, Select, ImageUrlInput } from '../components/ui/Input';
 
 const SECTORS = [
   { value: 'restaurant', label: 'Restoran' },
@@ -48,7 +48,7 @@ const defaultContent = {
 const DEFAULT_SMTP = { enabled: false, host: '', port: 587, secure: false, user: '', pass: '', fromName: '' };
 
 export default function CompanySettingsPage() {
-  const { activeTenantId } = useAuth();
+  const { activeTenantId, user } = useAuth();
   const { toast } = useToast();
   const qc = useQueryClient();
   const [activeTab, setActiveTab] = useState('genel');
@@ -63,13 +63,14 @@ export default function CompanySettingsPage() {
     branding: { primaryColor: '#2563EB', secondaryColor: '#1E40AF', logoLight: '', logoDark: '', heroImage: '' },
     settings: { defaultLanguage: 'tr', supportedLanguages: ['tr'] },
     description: { tr: '', en: '' },
-    contact: { phone: '', email: '', address: '', city: '', country: 'Türkiye', mapUrl: '' },
+    contact: { phone: '', whatsapp: '', email: '', address: '', city: '', country: 'Türkiye', mapUrl: '' },
     workingHours: [
       { days: 'Pazartesi – Cuma', hours: '08:00 – 22:00' },
       { days: 'Cumartesi – Pazar', hours: '07:30 – 23:00' },
     ],
     socialLinks: { instagram: '', facebook: '', twitter: '', youtube: '', tiktok: '' },
     integrations: { analyticsPropertyId: '' },
+    features: { aiContent: false, whatsapp: false },
     emailSettings: {
       senderName: '',
       replyTo: '',
@@ -112,6 +113,7 @@ export default function CompanySettingsPage() {
         description: { tr: company.description?.tr || '', en: company.description?.en || '' },
         contact: {
           phone: company.contact?.phone || '',
+          whatsapp: company.contact?.whatsapp || '',
           email: company.contact?.email || '',
           address: company.contact?.address || '',
           city: company.contact?.city || '',
@@ -130,6 +132,10 @@ export default function CompanySettingsPage() {
         },
         integrations: {
           analyticsPropertyId: company.integrations?.analyticsPropertyId || '',
+        },
+        features: {
+          aiContent: company.features?.aiContent ?? false,
+          whatsapp:  company.features?.whatsapp  ?? false,
         },
         emailSettings: {
           senderName: company.emailSettings?.senderName || '',
@@ -189,6 +195,15 @@ export default function CompanySettingsPage() {
   useEffect(() => {
     if (smtpData) setSmtpForm({ ...DEFAULT_SMTP, ...smtpData });
   }, [smtpData]);
+
+  const featuresMutation = useMutation({
+    mutationFn: (data) => api.patch(`/companies/${activeTenantId}/features`, data).then((r) => r.data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['company', activeTenantId] });
+      toast.success('Özellikler kaydedildi');
+    },
+    onError: (err) => toast.error(err.response?.data?.message || 'Kaydedilemedi'),
+  });
 
   const smtpMutation = useMutation({
     mutationFn: (data) => api.patch(`/companies/${activeTenantId}/smtp`, data).then((r) => r.data),
@@ -258,8 +273,8 @@ export default function CompanySettingsPage() {
     <div className="max-w-5xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Firma Ayarları</h1>
-        <Button onClick={() => saveMutation.mutate(form)} disabled={saveMutation.isPending}>
-          {saveMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+        <Button onClick={() => saveMutation.mutate(form)} loading={saveMutation.isPending}>
+          Kaydet
         </Button>
       </div>
 
@@ -310,14 +325,8 @@ export default function CompanySettingsPage() {
                   </div>
                 ))}
               </div>
-              <Input label="Logo (Açık Tema) URL" value={form.branding.logoLight} onChange={(e) => set('branding.logoLight', e.target.value)} placeholder="https://..." />
-              <Input label="Logo (Koyu Tema) URL" value={form.branding.logoDark} onChange={(e) => set('branding.logoDark', e.target.value)} placeholder="https://..." />
-              {form.branding.logoLight && (
-                <div>
-                  <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>Önizleme</p>
-                  <img src={form.branding.logoLight} alt="Logo" className="h-12 object-contain" />
-                </div>
-              )}
+              <ImageUrlInput label="Logo (Açık Tema) URL" value={form.branding.logoLight} onChange={(e) => set('branding.logoLight', e.target.value)} hint="200×60px" />
+              <ImageUrlInput label="Logo (Koyu Tema) URL" value={form.branding.logoDark} onChange={(e) => set('branding.logoDark', e.target.value)} hint="200×60px" />
             </Section>
 
             <Section title="Dil Ayarları">
@@ -341,6 +350,34 @@ export default function CompanySettingsPage() {
               <div className="grid grid-cols-2 gap-4">
                 <Input label="Telefon" value={form.contact.phone} onChange={(e) => set('contact.phone', e.target.value)} placeholder="+90 262 123 45 67" />
                 <Input label="E-posta" value={form.contact.email} onChange={(e) => set('contact.email', e.target.value)} placeholder="info@firma.com" />
+              </div>
+              <div className="rounded-xl border p-4" style={{ borderColor: 'var(--border)', background: 'var(--bg-muted)' }}>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xl">📱</span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>WhatsApp İletişim Numarası</p>
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Web sitesinde "WhatsApp'tan Sipariş Ver" butonu bu numarayı kullanır. Tüm sektörler için geçerlidir.</p>
+                  </div>
+                </div>
+                <Input
+                  label="WhatsApp Numarası"
+                  value={form.contact.whatsapp}
+                  onChange={(e) => set('contact.whatsapp', e.target.value)}
+                  placeholder="+90 532 123 45 67"
+                />
+                {form.contact.whatsapp && (
+                  <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
+                    Önizleme:{' '}
+                    <a
+                      href={`https://wa.me/${form.contact.whatsapp.replace(/\D/g, '').replace(/^0/, '90')}`}
+                      target="_blank" rel="noopener noreferrer"
+                      className="underline"
+                      style={{ color: '#25D366' }}
+                    >
+                      wa.me/{form.contact.whatsapp.replace(/\D/g, '').replace(/^0/, '90')}
+                    </a>
+                  </p>
+                )}
               </div>
               <Input label="Adres" value={form.contact.address} onChange={(e) => set('contact.address', e.target.value)} placeholder="Mahalle, Sokak No" />
               <div className="grid grid-cols-2 gap-4">
@@ -452,39 +489,27 @@ export default function CompanySettingsPage() {
         {activeTab === 'gorsel' && (
           <>
             <Section title="Hero Görseli">
-              <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Ana sayfanın tam ekran arka plan görseli (önerilen: 1600×900px)</p>
-              <Input label="Hero Görsel URL" value={form.content.heroImage}
-                onChange={(e) => set('content.heroImage', e.target.value)} placeholder="https://..." />
-              {form.content.heroImage && (
-                <img src={form.content.heroImage} alt="hero" className="w-full h-36 object-cover rounded-lg" />
-              )}
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Ana sayfanın tam ekran arka plan görseli</p>
+              <ImageUrlInput label="Hero Görsel URL" value={form.content.heroImage}
+                onChange={(e) => set('content.heroImage', e.target.value)} hint="1600×900px" />
             </Section>
 
             <Section title="Ana Sayfa — Hakkımızda Önizleme Görselleri">
-              <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>Ana sayfada 2×2 grid halinde gösterilen 4 görsel</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Ana sayfada 2×2 grid halinde gösterilen 4 görsel</p>
               {form.content.homeImages.map((url, i) => (
-                <div key={i}>
-                  <Input label={`Görsel ${i + 1}`} value={url}
-                    onChange={(e) => setArrayItem('content.homeImages', i, e.target.value)} placeholder="https://..." />
-                  {url && <img src={url} alt={`home-${i}`} className="mt-1 h-20 w-full object-cover rounded" />}
-                </div>
+                <ImageUrlInput key={i} label={`Görsel ${i + 1}`} value={url}
+                  onChange={(e) => setArrayItem('content.homeImages', i, e.target.value)} hint="600×800px" />
               ))}
             </Section>
 
             <Section title="Hakkımızda Sayfası Görselleri">
-              <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>Hakkımızda hero görseli ve 2×2 grid görseller</p>
-              <Input label="Hero Görseli (Hakkımızda)" value={form.content.aboutHeroImage}
-                onChange={(e) => set('content.aboutHeroImage', e.target.value)} placeholder="https://..." />
-              {form.content.aboutHeroImage && (
-                <img src={form.content.aboutHeroImage} alt="about-hero" className="w-full h-32 object-cover rounded-lg" />
-              )}
-              <div className="mt-2 space-y-3">
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Hakkımızda hero görseli ve 2×2 grid görseller</p>
+              <ImageUrlInput label="Hero Görseli (Hakkımızda)" value={form.content.aboutHeroImage}
+                onChange={(e) => set('content.aboutHeroImage', e.target.value)} hint="1200×600px" />
+              <div className="space-y-3">
                 {form.content.aboutImages.map((url, i) => (
-                  <div key={i}>
-                    <Input label={`Yan Görsel ${i + 1}`} value={url}
-                      onChange={(e) => setArrayItem('content.aboutImages', i, e.target.value)} placeholder="https://..." />
-                    {url && <img src={url} alt={`about-${i}`} className="mt-1 h-20 w-full object-cover rounded" />}
-                  </div>
+                  <ImageUrlInput key={i} label={`Yan Görsel ${i + 1}`} value={url}
+                    onChange={(e) => setArrayItem('content.aboutImages', i, e.target.value)} hint="600×800px" />
                 ))}
               </div>
             </Section>
@@ -734,19 +759,55 @@ export default function CompanySettingsPage() {
 
         {/* ── ENTEGRASYONLAR ── */}
         {activeTab === 'entegrasyon' && (
-          <Section title="Google Analytics 4">
-            <div className="rounded-lg p-4 text-sm mb-2" style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}>
-              <p className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Nasıl bulunur?</p>
-              <p>GA4 → Yönetici → Mülk Ayarları → <strong>Mülk Kimliği</strong> (sadece sayısal kısım, örn: <code>323456789</code>)</p>
-              <p className="mt-1">Servis hesabı e-postasını da GA4 mülkünüze <strong>Görüntüleyici</strong> olarak eklemeniz gerekir.</p>
-            </div>
-            <Input
-              label="GA4 Mülk Kimliği (Property ID)"
-              value={form.integrations.analyticsPropertyId}
-              onChange={(e) => set('integrations.analyticsPropertyId', e.target.value.replace(/\D/g, ''))}
-              placeholder="323456789"
-            />
-          </Section>
+          <>
+            <Section title="Google Analytics 4">
+              <div className="rounded-lg p-4 text-sm mb-2" style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}>
+                <p className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>Nasıl bulunur?</p>
+                <p>GA4 → Yönetici → Mülk Ayarları → <strong>Mülk Kimliği</strong> (sadece sayısal kısım, örn: <code>323456789</code>)</p>
+                <p className="mt-1">Servis hesabı e-postasını da GA4 mülkünüze <strong>Görüntüleyici</strong> olarak eklemeniz gerekir.</p>
+              </div>
+              <Input
+                label="GA4 Mülk Kimliği (Property ID)"
+                value={form.integrations.analyticsPropertyId}
+                onChange={(e) => set('integrations.analyticsPropertyId', e.target.value.replace(/\D/g, ''))}
+                placeholder="323456789"
+              />
+            </Section>
+
+            {user?.isSuperAdmin && (
+              <Section title="🔒 Firma Özellikleri (Netravox Yönetimi)">
+                <div className="rounded-lg p-4 text-sm mb-4" style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}>
+                  Bu özellikler yalnızca Netravox Super Admin tarafından açılıp kapatılabilir.
+                </div>
+
+                <div className="space-y-4">
+                  <FeatureToggle
+                    icon="✨"
+                    label="AI Blog Üretimi"
+                    description={'Blog editöründe "AI ile Üret" butonu görünür. OpenAI API key sunucuda tanımlı olmalıdır.'}
+                    enabled={form.features?.aiContent}
+                    onToggle={() => set('features.aiContent', !form.features?.aiContent)}
+                  />
+                  <FeatureToggle
+                    icon="💬"
+                    label="WhatsApp Butonu"
+                    description="Firma sitesinde sağ alt köşede WhatsApp iletişim balonu görünür. İletişim > WhatsApp numarası dolu olmalıdır."
+                    enabled={form.features?.whatsapp}
+                    onToggle={() => set('features.whatsapp', !form.features?.whatsapp)}
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <Button
+                    onClick={() => featuresMutation.mutate({ aiContent: form.features?.aiContent, whatsapp: form.features?.whatsapp })}
+                    loading={featuresMutation.isPending}
+                  >
+                    Özellikleri Kaydet
+                  </Button>
+                </div>
+              </Section>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -758,6 +819,32 @@ function Section({ title, children }) {
     <div className="rounded-xl border p-5 space-y-4" style={{ borderColor: 'var(--border)', background: 'var(--bg-surface)' }}>
       <h2 className="font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
       {children}
+    </div>
+  );
+}
+
+function FeatureToggle({ icon, label, description, enabled, onToggle }) {
+  return (
+    <div className="flex items-start gap-4 py-3 border-b last:border-0" style={{ borderColor: 'var(--border)' }}>
+      <div
+        onClick={onToggle}
+        className="relative w-11 h-6 rounded-full flex-shrink-0 cursor-pointer transition-colors mt-0.5"
+        style={{ background: enabled ? 'var(--primary)' : 'var(--border)' }}
+      >
+        <span
+          className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform"
+          style={{ transform: enabled ? 'translateX(20px)' : 'translateX(0)' }}
+        />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+          {icon} {label}
+          <span className="ml-2 text-xs font-normal px-1.5 py-0.5 rounded" style={{ background: enabled ? 'var(--primary)' : 'var(--border)', color: enabled ? '#fff' : 'var(--text-secondary)' }}>
+            {enabled ? 'Etkin' : 'Devre dışı'}
+          </span>
+        </p>
+        <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{description}</p>
+      </div>
     </div>
   );
 }

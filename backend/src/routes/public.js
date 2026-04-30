@@ -9,6 +9,8 @@ const Service = require('../models/Service');
 const Property = require('../models/Property');
 const Faq = require('../models/Faq');
 const BlogPost = require('../models/BlogPost');
+const Page = require('../models/Page');
+const NavigationMenu = require('../models/NavigationMenu');
 const { publicFormLimiter } = require('../middleware/rateLimit');
 const { validate } = require('../middleware/validate');
 const { safeStr } = require('../utils/query');
@@ -94,6 +96,63 @@ router.get('/:slug/properties', async (req, res) => {
   res.json(properties);
 });
 
+// GET /api/public/:slug/navigation  — { tr: items[], en: items[] }
+router.get('/:slug/navigation', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+
+  const menus = await NavigationMenu.find({ tenantId: company._id, name: 'main-nav' }).lean();
+  const result = {};
+  for (const menu of menus) {
+    result[menu.language] = menu.items.sort((a, b) => (a.order || 0) - (b.order || 0));
+  }
+  res.json(result);
+});
+
+// GET /api/public/:slug/pages[?template=home]
+router.get('/:slug/pages', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+
+  const filter = { tenantId: company._id, status: 'published' };
+  if (req.query.template) filter.template = req.query.template;
+
+  // template ile arama: içerik dahil tek sayfa döner
+  if (req.query.template) {
+    const page = await Page.findOne(filter).lean();
+    if (!page) return res.status(404).json({ message: 'Sayfa bulunamadı' });
+    return res.json(page);
+  }
+
+  const pages = await Page.find(filter)
+    .select('slug title template featuredImage seo publishedAt')
+    .sort('template')
+    .lean();
+  res.json(pages);
+});
+
+// GET /api/public/:slug/pages/:pageSlug
+router.get('/:slug/pages/:pageSlug', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+  const page = await Page.findOne({
+    tenantId: company._id,
+    status: 'published',
+    $or: [{ 'slug.tr': req.params.pageSlug }, { 'slug.en': req.params.pageSlug }],
+  }).lean();
+  if (!page) return res.status(404).json({ message: 'Sayfa bulunamadı' });
+  res.json(page);
+});
+
+// GET /api/public/:slug/services/:id  (tek ürün detayı)
+router.get('/:slug/services/:id', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).json({ message: 'Firma bulunamadı' });
+  const service = await Service.findOne({ _id: req.params.id, tenantId: company._id, isActive: true }).lean();
+  if (!service) return res.status(404).json({ message: 'Ürün bulunamadı' });
+  res.json(service);
+});
+
 // POST /api/public/:slug/reservation  (restoran)
 router.post('/:slug/reservation', publicFormLimiter, validate('reservation'), async (req, res) => {
   const company = await findCompany(req.params.slug);
@@ -169,6 +228,67 @@ router.get('/:slug/blog/:postSlug', async (req, res) => {
   });
   if (!post) return res.status(404).json({ message: 'Blog yazısı bulunamadı' });
   res.json(post);
+});
+
+// GET /api/public/:slug/robots.txt
+router.get('/:slug/robots.txt', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).send('Not found');
+  const domain = company.domain || `https://${company.slug}.com`;
+  res.set('Content-Type', 'text/plain');
+  res.send(`User-agent: *\nAllow: /\n\nSitemap: ${domain}/sitemap.xml\n`);
+});
+
+// GET /api/public/:slug/sitemap.xml
+router.get('/:slug/sitemap.xml', async (req, res) => {
+  const company = await findCompany(req.params.slug);
+  if (!company) return res.status(404).send('Not found');
+
+  const domain = company.domain || `https://${company.slug}.com`;
+
+  const [posts, services, publishedPages] = await Promise.all([
+    BlogPost.find({ tenantId: company._id, status: 'published' }).select('slug updatedAt').lean(),
+    Service.find({ tenantId: company._id, isActive: true }).select('_id updatedAt').lean(),
+    Page.find({ tenantId: company._id, status: 'published' }).select('slug updatedAt').lean(),
+  ]);
+
+  const pageRoutes = publishedPages.length > 0
+    ? publishedPages.map((p) => {
+        const slug = p.slug?.tr || '';
+        return slug ? `/${slug}` : '/';
+      })
+    : ['/', '/hakkimizda', '/koleksiyonlar', '/blog', '/iletisim'];
+
+  const urls = [
+    ...pageRoutes.map((path) => `
+  <url>
+    <loc>${domain}${path}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>${path === '/' ? '1.0' : '0.8'}</priority>
+  </url>`),
+    ...posts.map((p) => `
+  <url>
+    <loc>${domain}/blog/${p.slug}</loc>
+    <lastmod>${new Date(p.updatedAt).toISOString().split('T')[0]}</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>`),
+    ...services.map((s) => `
+  <url>
+    <loc>${domain}/koleksiyonlar/${s._id}</loc>
+    <lastmod>${new Date(s.updatedAt).toISOString().split('T')[0]}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>`),
+  ];
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.join('')}
+</urlset>`;
+
+  res.set('Content-Type', 'application/xml');
+  res.send(xml);
 });
 
 // POST /api/public/:slug/contact

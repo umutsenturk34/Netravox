@@ -1,5 +1,5 @@
-export default function Button({ children, variant = 'primary', size = 'md', disabled, onClick, type = 'button', className = '' }) {
-  const base = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
+export default function Button({ children, variant = 'primary', size = 'md', disabled, loading, onClick, type = 'button', className = '' }) {
+  const base = 'inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
   const sizes = {
     sm: 'px-3 py-1.5 text-xs',
@@ -21,10 +21,13 @@ export default function Button({ children, variant = 'primary', size = 'md', dis
     <button
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled || loading}
       className={`${base} ${sizes[size]} ${variantStyle} ${className}`}
       style={isSecondary ? { borderColor: 'var(--border)' } : {}}
     >
+      {loading && (
+        <span className="w-3.5 h-3.5 border-2 border-current border-t-transparent rounded-full animate-spin flex-shrink-0" />
+      )}
       {children}
     </button>
   );

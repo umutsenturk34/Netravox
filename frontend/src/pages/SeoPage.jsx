@@ -4,7 +4,7 @@ import api from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
-import { Input, Textarea } from '../components/ui/Input';
+import { Input, Textarea, ImageUrlInput } from '../components/ui/Input';
 
 const TABS = [
   { id: 'general', label: 'Genel' },
@@ -104,7 +104,7 @@ export default function SeoPage() {
             <Textarea label="Meta Açıklama (TR)" rows={3} value={form.defaultMetaDescription.tr} onChange={(e) => setLang('defaultMetaDescription', 'tr', e.target.value)} />
             <Textarea label="Meta Açıklama (EN)" rows={3} value={form.defaultMetaDescription.en} onChange={(e) => setLang('defaultMetaDescription', 'en', e.target.value)} />
           </div>
-          <Input label="Varsayılan OG Görseli URL" value={form.defaultOgImage} onChange={(e) => set('defaultOgImage', e.target.value)} placeholder="https://..." />
+          <ImageUrlInput label="Varsayılan OG Görseli URL" value={form.defaultOgImage} onChange={(e) => set('defaultOgImage', e.target.value)} hint="1200×630px" />
           <div className="border-t pt-4 space-y-4" style={{ borderColor: 'var(--border)' }}>
             <Input label="Google Analytics ID" value={form.googleAnalyticsId} onChange={(e) => set('googleAnalyticsId', e.target.value)} placeholder="G-XXXXXXXXXX" />
             <Input label="Google Tag Manager ID" value={form.googleTagManagerId} onChange={(e) => set('googleTagManagerId', e.target.value)} placeholder="GTM-XXXXXXX" />

@@ -5,7 +5,7 @@ import { PlusCircle, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import api from '../api/client';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
-import { Input, Textarea, Select } from '../components/ui/Input';
+import { Input, Textarea, Select, ImageUrlInput } from '../components/ui/Input';
 import RichTextEditor from '../components/ui/RichTextEditor';
 
 const TEMPLATES = [
@@ -68,40 +68,35 @@ function ContentFields({ template, content, onChange, lang }) {
 
   if (template === 'home') return (
     <div className="space-y-4">
-      <Input label="Hero Başlık" value={get('heroTitle')} onChange={(e) => setLang('heroTitle', e.target.value)} placeholder={lang === 'tr' ? 'Ana başlık metni' : 'Main headline'} />
+      <Input label="Hero Başlık" value={get('heroTitle')} onChange={(e) => setLang('heroTitle', e.target.value)} placeholder={lang === 'tr' ? 'Sadeliğin\nGücü.' : 'The Power\nOf Simplicity.'} hint="Satır atlamak için \n kullanın" />
       <Input label="Hero Alt Başlık" value={get('heroSubtitle')} onChange={(e) => setLang('heroSubtitle', e.target.value)} />
-      <Input label="Hero Görsel URL" value={getPlain('heroImageUrl')} onChange={(e) => set('heroImageUrl', e.target.value)} placeholder="https://cdn.../hero.webp" />
-      <Input label="CTA Buton Metni" value={get('ctaText')} onChange={(e) => setLang('ctaText', e.target.value)} placeholder={lang === 'tr' ? 'Rezervasyon Yap' : 'Book a Table'} />
-      <Input label="CTA Bağlantı" value={getPlain('ctaUrl')} onChange={(e) => set('ctaUrl', e.target.value)} placeholder="/rezervasyon" />
-      <div>
-        <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Hakkında Özet Metin</p>
-        <RichTextEditor
-          value={get('aboutText')}
-          onChange={(val) => setLang('aboutText', val)}
-          placeholder={lang === 'tr' ? 'Kısa tanıtım metni...' : 'Short about text...'}
-        />
-      </div>
+      <ImageUrlInput label="Hero Görsel URL" value={getPlain('heroImageUrl')} onChange={(e) => set('heroImageUrl', e.target.value)} hint="1600×900px" />
+      <Input label="Duyuru Bandı Metni" value={get('announcementText')} onChange={(e) => setLang('announcementText', e.target.value)} placeholder={lang === 'tr' ? 'Ücretsiz kargo · 750 ₺ ve üzeri...' : 'Free shipping · Orders over...'} />
+      <Input label="Ana CTA Metni" value={get('ctaText')} onChange={(e) => setLang('ctaText', e.target.value)} placeholder={lang === 'tr' ? 'Koleksiyonu Keşfet' : 'Explore Collection'} />
+      <Input label="İkincil CTA Metni" value={get('ctaSecondaryText')} onChange={(e) => setLang('ctaSecondaryText', e.target.value)} placeholder={lang === 'tr' ? 'Hikayemiz' : 'Our Story'} />
+      <Input label="CTA Bağlantı" value={getPlain('ctaUrl')} onChange={(e) => set('ctaUrl', e.target.value)} placeholder="/koleksiyonlar" />
+      <Input label="Hikaye Bölümü Başlığı" value={get('storyTitle')} onChange={(e) => setLang('storyTitle', e.target.value)} placeholder={lang === 'tr' ? 'Sadelikten\nGüç Doğar' : 'Power from\nSimplicity'} hint="Satır atlamak için \n kullanın" />
+      <Input label="Alt CTA Başlığı" value={get('ctaBottomTitle')} onChange={(e) => setLang('ctaBottomTitle', e.target.value)} placeholder={lang === 'tr' ? 'Koleksiyonu\nKeşfet' : 'Explore the\nCollection'} hint="Satır atlamak için \n kullanın" />
+      <Input label="Alt CTA Buton Metni" value={get('ctaBottomText')} onChange={(e) => setLang('ctaBottomText', e.target.value)} placeholder={lang === 'tr' ? 'Tüm Ürünleri Gör' : 'View All Products'} />
     </div>
   );
 
   if (template === 'about') return (
     <div className="space-y-4">
+      <ImageUrlInput label="Hero Görsel URL" value={getPlain('imageUrl')} onChange={(e) => set('imageUrl', e.target.value)} hint="1200×800px" />
+      <Input label="Misyon Başlığı" value={get('missionTitle')} onChange={(e) => setLang('missionTitle', e.target.value)} placeholder={lang === 'tr' ? 'Minimal Tasarım.\nMaksimal Etki.' : 'Minimal Design.\nMaximum Impact.'} hint="Satır atlamak için \n kullanın" />
       <div>
-        <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Hakkımızda Metni</p>
+        <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Hakkımızda Metni (HTML)</p>
         <RichTextEditor
           value={get('body')}
           onChange={(val) => setLang('body', val)}
-          placeholder={lang === 'tr' ? 'Firmayı anlatan uzun metin...' : 'About text...'}
+          placeholder={lang === 'tr' ? 'Firmayı anlatan paragraflar...' : 'About paragraphs...'}
         />
       </div>
-      <Input label="Görsel URL" value={getPlain('imageUrl')} onChange={(e) => set('imageUrl', e.target.value)} placeholder="https://cdn.../about.webp" />
-      <Input label="Misyon Başlığı" value={get('missionTitle')} onChange={(e) => setLang('missionTitle', e.target.value)} />
-      <div>
-        <p className="text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Misyon Metni</p>
-        <RichTextEditor
-          value={get('missionText')}
-          onChange={(val) => setLang('missionText', val)}
-        />
+      <div className="p-3 rounded-lg text-xs space-y-1" style={{ background: 'var(--bg-muted)', color: 'var(--text-muted)' }}>
+        <p className="font-semibold" style={{ color: 'var(--text-secondary)' }}>İstatistikler (stats)</p>
+        <p>Örnek: <code>[&#123;"value":"2023","label":&#123;"tr":"Kuruluş Yılı","en":"Founded"&#125;&#125;]</code></p>
+        <p>stats alanı şu an seed ile girilmiş. JSON düzenleyiciden değiştirilebilir.</p>
       </div>
     </div>
   );
@@ -458,7 +453,7 @@ export default function PageEditorPage() {
                   <option value="noindex,nofollow">noindex, nofollow</option>
                 </Select>
               </div>
-              <Input label="OG Görsel URL" value={form.seo.ogImage || ''} onChange={(e) => set('seo.ogImage', e.target.value)} placeholder="https://cdn.../og-image.jpg" />
+              <ImageUrlInput label="OG Görsel URL" value={form.seo.ogImage || ''} onChange={(e) => set('seo.ogImage', e.target.value)} hint="1200×630px" />
 
               {/* Schema önizleme */}
               {form.content?.faq_tr?.filter((f) => f.question).length > 0 && (

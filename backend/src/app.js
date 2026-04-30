@@ -39,6 +39,7 @@ app.use(cors({
     // Production: origin zorunlu
     // Development: origin yoksa (curl, Postman) izin ver
     if (!origin && nodeEnv !== 'production') return cb(null, true);
+    if (nodeEnv !== 'production' && origin && /^http:\/\/localhost:\d+$/.test(origin)) return cb(null, true);
     if (origin && allowedOrigins.includes(origin)) return cb(null, true);
     cb(new Error(`CORS: ${origin || 'no-origin'} izin verilmedi`));
   },

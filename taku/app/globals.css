@@ -1,0 +1,36 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  --color-primary: #0A0A0A;
+  --color-secondary: #F5F4F0;
+  --color-accent: #C8A882;
+}
+
+@layer base {
+  *, ::before, ::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: var(--color-secondary);
+    color: var(--color-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  img { display: block; max-width: 100%; }
+}
+
+::selection {
+  background: var(--color-primary);
+  color: var(--color-secondary);
+}
